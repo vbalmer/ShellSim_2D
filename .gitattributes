@@ -1,52 +1,52 @@
-**/mat_res.pkl filter=lfs diff=lfs merge=lfs -text
-data_normalisation_nonlin/*.pkl filter=lfs diff=lfs merge=lfs -text
-data_normalisation_nonlin/single/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/data_normalisation_nonlin/double/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_317/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_320/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_313/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_312/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_346/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_347/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_365/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_366/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_368/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/new_data/_simple_logs/v_369/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_449/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_453/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_454/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_457/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_460/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_461/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_462/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_463/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_464/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_465/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_466/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_468/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_469/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_472/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_473/*.pkl filter=lfs diff=lfs merge=lfs -text
+# **/mat_res.pkl filter=lfs diff=lfs merge=lfs -text
+# data_normalisation_nonlin/*.pkl filter=lfs diff=lfs merge=lfs -text
+# data_normalisation_nonlin/single/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/data_normalisation_nonlin/double/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_317/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_320/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_313/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_312/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_346/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_347/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_365/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_366/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_368/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/new_data/_simple_logs/v_369/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_449/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_453/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_454/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_457/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_460/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_461/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_462/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_463/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_464/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_465/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_466/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_468/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_469/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_472/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_473/*.pkl filter=lfs diff=lfs merge=lfs -text
 
 
 
-04_Training/new_data/data_normalisation_nonlin/single/*.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/data/data_20250516_1951_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/data/data_20251103_1552_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/data/data_20251103_1706_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
-# 04_Training/data/data_20251103_2316_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/data/data_20251105_1603_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/data_normalisation_nonlin/single/*.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/data/data_20250516_1951_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/data/data_20251103_1552_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/data/data_20251103_1706_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
+# # 04_Training/data/data_20251103_2316_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/data/data_20251105_1603_fake/new_data_De.pkl filter=lfs diff=lfs merge=lfs -text
 
-04_Training/data/data_*_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
-
-
+# 04_Training/data/data_*_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
 
 
 
-04_Training/new_data/data_normalisation_nonlin/log/*.pkl filter=lfs diff=lfs merge=lfs -text
- filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/data_normalisation_nonlin/single/data_20250603_2149_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/data_normalisation_nonlin/double/data_20250603_2149_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/data_normalisation_nonlin/double/data_20250603_2149_fake_pureD/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_377/*.pkl filter=lfs diff=lfs merge=lfs -text
-04_Training/new_data/_simple_logs/v_397/*.pkl filter=lfs diff=lfs merge=lfs -text
+
+
+# 04_Training/new_data/data_normalisation_nonlin/log/*.pkl filter=lfs diff=lfs merge=lfs -text
+#  filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/data_normalisation_nonlin/single/data_20250603_2149_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/data_normalisation_nonlin/double/data_20250603_2149_fake/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/data_normalisation_nonlin/double/data_20250603_2149_fake_pureD/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_377/*.pkl filter=lfs diff=lfs merge=lfs -text
+# 04_Training/new_data/_simple_logs/v_397/*.pkl filter=lfs diff=lfs merge=lfs -text
