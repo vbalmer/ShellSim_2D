@@ -1,0 +1,11 @@
+04_Training/trained_model.pkl
+04_Training/wandb/
+04_Training/lightning_logs/
+04_Training/logs/train_log/
+04_Training/_old/
+wandb/
+wandb_figures_published
+*.pkl
+*.png
+*.npy
+*.pt

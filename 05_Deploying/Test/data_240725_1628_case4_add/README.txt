@@ -1,0 +1,1 @@
+model with architecture including t as input

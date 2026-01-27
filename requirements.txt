@@ -1,0 +1,5 @@
+pip install ipykernel numpy pyDOE pandas python-math TIME-python matplotlib scipy scikit-learn wandb
+
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+pip install  torchvision pytorch_forecasting
