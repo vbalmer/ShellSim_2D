@@ -37,15 +37,17 @@ def read_sampled_data(path):
     return mat_data
 
 def setup_figure_format():
-    plt.rcParams["text.usetex"] = True
-    plt.rcParams["text.latex.preamble"] = (
+    # mpl.rcParams["text.usetex"] = True
+    mpl.rcParams["text.latex.preamble"] = (
         r"\usepackage{mathptmx}\usepackage{amsmath}\usepackage{upgreek}"
     )
-    plt.rcParams["font.family"] = "Times New Roman"
-    plt.rcParams["mathtext.rm"] = "Times New Roman"
-    plt.rcParams["mathtext.it"] = "Times New Roman:italic"
-    plt.rcParams["mathtext.bf"] = "Times New Roman:bold"
-    plt.rcParams["font.size"] = 10
+    mpl.rcParams["font.family"] = "Times New Roman"
+    mpl.rcParams["mathtext.rm"] = "Times New Roman"
+    mpl.rcParams["mathtext.it"] = "Times New Roman:italic"
+    mpl.rcParams["mathtext.bf"] = "Times New Roman:bold"
+    mpl.rcParams["font.size"] = 10
+    mpl.rcParams['mathtext.fontset'] = 'stix'
+
     return
 
 def plotting_scatter(fig, mat_all, labels, vars, p):
@@ -57,19 +59,19 @@ def plotting_scatter(fig, mat_all, labels, vars, p):
         for name, color in zip(labels, colors):
             
             axs[i].scatter(mat_all[name][var][::p[name],0], mat_all[name][var][::p[name],1], mat_all[name][var][::p[name],2], 
-                            label = name+', n = '+str(int(np.round(mat_all[name][var].shape[0]/1000,0))) + '$\cdot 10^3$', 
-                            color = color, alpha = 0.2, s = 2)
+                            label = name+', $N$ = '+str(int(np.round(mat_all[name][var].shape[0]/1000,0))) + '$\cdot$ 10$^3$', 
+                            color = color,  edgecolors='none', alpha = 0.2, s = 2)
 
     return axs
 
 def final_touches(fig, axs):
     # Axes labels
-    axs[0].set_xlabel(r"$\epsilon_x$ [‰]")
-    axs[0].set_ylabel(r"$\epsilon_y$ [‰]")
-    axs[0].set_zlabel(r"$\gamma_{xy}$ [‰]")
-    axs[1].set_xlabel("$n_x$ [kN/m]")
-    axs[1].set_ylabel("$n_y$ [kN/m]")
-    axs[1].set_zlabel("$n_{xy}$ [kN/m]")
+    axs[0].set_xlabel(r"ε$_x$ [‰]", fontname="Times New Roman")
+    axs[0].set_ylabel(r"ε$_y$ [‰]", fontname="Times New Roman")
+    axs[0].set_zlabel(r"γ$_{xy}$ [‰]", fontname="Times New Roman")
+    axs[1].set_xlabel(r"$\it{n}$$_x$ [kN/m]", fontname="Times New Roman")
+    axs[1].set_ylabel(r"$\it{n}$$_y$ [kN/m]", fontname="Times New Roman")
+    axs[1].set_zlabel(r"$\it{n}$$_{xy}$ [kN/m]", fontname="Times New Roman")
 
     # Set maxima and minima
     axs[0].set_xlim(-5,50)
@@ -79,13 +81,25 @@ def final_touches(fig, axs):
     axs[1].set_ylim(-11000,2000)
     axs[1].set_zlim(-4500,4500)
 
+    # Turn in the right way
+    axs[0].view_init(elev=30, azim=30)
+    axs[1].view_init(elev=30, azim=30)
 
     # Legend
-    fig.legend(
-        loc='upper center', 
-        bbox_to_anchor=(0.5, -0.05),
+    fig.subplots_adjust(bottom=0.2, left=0.32, right=0.95, top=0.9, wspace = 0.5)
+    handles, labels = [], []
+    handles, labels = axs[0].get_legend_handles_labels()
+    
+    legend = fig.legend(
+        handles,
+        labels,
+        loc='lower center',
         ncol=2,
+        bbox_to_anchor=(0.5, 0.02)
     )
+    for handle in legend.legend_handles:
+        handle.set_sizes([20])
+        handle.set_alpha(1) 
 
     for ax in axs:
         # Layouting gridlines / axes 
@@ -95,16 +109,40 @@ def final_touches(fig, axs):
         for pane in [ax.xaxis.pane, ax.yaxis.pane, ax.zaxis.pane]:
             pane.set_facecolor((1,1,1,0))
             pane.set_edgecolor("black")
-            pane.set_linewidth(1.5)
+            pane.set_linewidth(0)
+            pane.fill = False
         for axis in [ax.xaxis, ax.yaxis, ax.zaxis]:
             axis.line.set_color("black")
             axis.line.set_linewidth(0)
         
         # draw missing line:
-        xmin, _ = ax.get_xlim3d()
-        ymin, _ = ax.get_ylim3d()
+        xmin, xmax = ax.get_xlim3d()
+        ymin, ymax = ax.get_ylim3d()
         zmin, zmax = ax.get_zlim3d()
-        ax.plot([xmin, xmin], [ymin, ymin], [zmin, zmax], color="black", linewidth=1)
+
+        # 8 corners of the box
+        corners = np.array([[xmin, ymin, zmin],
+                            [xmax, ymin, zmin],
+                            [xmax, ymax, zmin],
+                            [xmin, ymax, zmin],
+                            [xmin, ymin, zmax],
+                            [xmax, ymin, zmax],
+                            [xmax, ymax, zmax],
+                            [xmin, ymax, zmax]])
+
+        # edges defined by corner indices
+        edges = [
+            [0,1],[1,2],[2,3],[3,0],  # bottom
+            [4,5],[7,4], #[5,6],[6,7],  # top
+            [0,4],[1,5],[3,7]#[2,6]   # verticals
+        ]
+
+        for e in edges:
+            ax.plot(*corners[e].T, color='black', linewidth=0.5)
+    
+    fig.patch.set_alpha(0)
+    # fig.tight_layout(pad = 5)
+    
         
     return fig, axs
 
@@ -125,8 +163,9 @@ def get_colorscale(n, cmap_name="viridis"):
 
 def save_figure(fig, save_path, plotname):
     if save_path is not None:
-        fig.savefig(save_path+plotname+'.pdf')    
-        print(f'Saved figure {plotname} at {save_path}' )
+        full_path = os.path.join(save_path, plotname + '.svg')
+        fig.savefig(full_path , bbox_inches='tight')    
+        print(f'Saved figure {plotname} at {save_path}')
     return
 
 

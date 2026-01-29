@@ -11,3 +11,4 @@ wandb_figures_published
 *.pt
 *.svg
 *.pdf
+*.json
