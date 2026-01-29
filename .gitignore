@@ -9,3 +9,5 @@ wandb_figures_published
 *.png
 *.npy
 *.pt
+*.svg
+*.pdf

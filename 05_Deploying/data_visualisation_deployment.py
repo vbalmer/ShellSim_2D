@@ -42,7 +42,7 @@ NUMIT = 0
 COPY = True
 # GEOM = np.array([250, 0.015, 2])
 
-path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_481')
+path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_480')
 path_depl = '05_Deploying\\data_out\\data_20260114_1018_casexx\\1350'
 save_path = '05_Deploying\\plots\\test'
 
