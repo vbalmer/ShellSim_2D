@@ -94,11 +94,16 @@ mat_data_names = {                                          #sorted in descendin
 # '144': '04_Training\data\data_20260108_2137_fake',
 # '145': '04_Training\data\data_20260109_1821_fake',
 # '146': '04_Training\data\data_20260110_1141_fake',
-'147': '04_Training\data\data_20260113_1403_fake',
-'148': '04_Training\data\data_20260113_1611_fake',
+# '147': '04_Training\data\data_20260113_1403_fake',
+# '148': '04_Training\data\data_20260113_1611_fake',
+'149': '04_Training\data\data_20260110_1721_fake'
 }
 
 mat_data_paths = get_paths_data(mat_data_names)
+REMOVE = True
+COMBINE = False
+
+
 
 ################## READ DATA #######################
 
@@ -107,10 +112,18 @@ print('Finished reading data')
 
 
 ################## COMBINE DATA #######################
+if COMBINE:
+        new_data_eps_np, new_data_sig_np, new_data_t_np, new_data_De_np = combine_all_data(numpy_data_dict, n1 = 1000000, n2 = 500000, n3 = 3000000)
+        # new_data_eps_np[:,2] = new_data_eps_np[:,2] / 2  # this did not have the anticipated effect - remove it again for now
 
-new_data_eps_np, new_data_sig_np, new_data_t_np, new_data_De_np = combine_all_data(numpy_data_dict, n1 = 1000000, n2 = 500000, n3 = 3000000)
-# new_data_eps_np[:,2] = new_data_eps_np[:,2] / 2  # this did not have the anticipated effect - remove it again for now
-
+################## REMOVE DATA #######################
+if REMOVE:
+        n_i = 5000
+        for key in mat_data_names:
+                new_data_eps_np = numpy_data_dict[key]['eps'][::n_i,:]
+                new_data_sig_np = numpy_data_dict[key]['sig'][::n_i,:]
+                new_data_t_np = numpy_data_dict[key]['t'][::n_i,:]
+                new_data_De_np = numpy_data_dict[key]['D'][::n_i,:,:].reshape((-1, 64))
 
 ################## SAVE DATA #######################
 # dump them into a new data folder

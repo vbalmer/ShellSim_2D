@@ -43,7 +43,7 @@ COPY = True
 # GEOM = np.array([250, 0.015, 2])
 
 path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_480')
-path_depl = '05_Deploying\\data_out\\data_20260114_1018_casexx\\1350'
+path_depl = '05_Deploying\\data_out\\data_20260217_1119_casexx\\50'
 save_path = '05_Deploying\\plots\\test'
 
 
@@ -79,6 +79,7 @@ if (not LOAD_PATH) and (not STRESS_PATHS):
 
 
         # print steel stresses
+
         if 'ssx' in mat_res_norm:
                 ssx = mat_res_norm['ssx'][0]
                 ssy = mat_res_norm['ssy'][0]
@@ -507,44 +508,43 @@ if STRESS_PATHS:
 
 if LOAD_PATH: 
 
-        path_depl = {
-               '2D-1': {
-                        '$\\rho_y$ = 1\%': 'data_20260119_0803_casexx',
-                        '$\\rho_y$ = 0.75\%': 'data_20260120_1817_casexx',
-                        '$\\rho_y$ = 1.5\%': 'data_20260120_1637_casexx',
-                },
-               '2D-2': {
-                        '$\\rho_y$ = 1\%': 'data_20260120_0836_casexx',
-                        '$\\rho_y$ = 0.75\%': 'data_20260121_1038_casexx',
-                        '$\\rho_y$ = 1.5\%': 'data_20260120_1945_casexx',
-                  },
-                '2D-3': {
-                        '$\\rho_y$ = 1\%': 'data_20260120_1008_casexx',
-                        '$\\rho_y$ = 0.75\%': 'data_20260121_1422_casexx',
-                        '$\\rho_y$ = 1.5\%': 'data_20260120_1447_casexx',
-                },
-                '2D-4': {
-                        '$\\rho_y$ = 1\%': 'data_20260120_1037_casexx',
-                        '$\\rho_y$ = 0.75\%': 'data_20260121_1251_casexx',
-                        '$\\rho_y$ = 1.5\%': 'data_20260121_1131_casexx',
-                },
-                '2D-5': {
-                        '$\\rho_y$ = 1\%': 'data_20260120_1210_casexx',
-                        '$\\rho_y$ = 0.75\%': 'data_20260121_1356_casexx',
-                        '$\\rho_y$ = 1.5\%': 'data_20260121_1549_casexx',
-                },
-        }
+        # path_depl = {
+        #        '2D-1': {
+        #                 '$\\rho_y$ = 1\%': 'data_20260119_0803_casexx',
+        #                 '$\\rho_y$ = 0.75\%': 'data_20260120_1817_casexx',
+        #                 '$\\rho_y$ = 1.5\%': 'data_20260120_1637_casexx',
+        #         },
+        #        '2D-2': {
+        #                 '$\\rho_y$ = 1\%': 'data_20260120_0836_casexx',
+        #                 '$\\rho_y$ = 0.75\%': 'data_20260121_1038_casexx',
+        #                 '$\\rho_y$ = 1.5\%': 'data_20260120_1945_casexx',
+        #           },
+        #         '2D-3': {
+        #                 '$\\rho_y$ = 1\%': 'data_20260120_1008_casexx',
+        #                 '$\\rho_y$ = 0.75\%': 'data_20260121_1422_casexx',
+        #                 '$\\rho_y$ = 1.5\%': 'data_20260120_1447_casexx',
+        #         },
+        #         '2D-4': {
+        #                 '$\\rho_y$ = 1\%': 'data_20260120_1037_casexx',
+        #                 '$\\rho_y$ = 0.75\%': 'data_20260121_1251_casexx',
+        #                 '$\\rho_y$ = 1.5\%': 'data_20260121_1131_casexx',
+        #         },
+        #         '2D-5': {
+        #                 '$\\rho_y$ = 1\%': 'data_20260120_1210_casexx',
+        #                 '$\\rho_y$ = 0.75\%': 'data_20260121_1356_casexx',
+        #                 '$\\rho_y$ = 1.5\%': 'data_20260121_1549_casexx',
+        #         },
+        # }
 
 
         # plot_load_path_wrapper(path_depl, case_study = '2D-1C', until_load_level = [1,18], 
         #                        save_path = save_path, type = 'eps', thresh = 5)
         
-        # plot_load_path_wrapper('05_Deploying\\data_out\\data_20260106_1642_casexx', case_study = '2D-8C', until_load_level = [0,7], 
-        #                        save_path = save_path, type = 'eps', thresh = 10)
-        # plot_load_path_wrapper('05_Deploying\\data_out\\data_20260106_0936_casexx', case_study = '2D-1', until_load_level = [0,12], 
-        #                        save_path = save_path, type = 'eps', thresh = 10)
+        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260220_1904_casexx', case_study = '2D-1C', until_load_level = [0,4], 
+                               save_path = save_path, type = 'u', thresh = 10)
+
         
         # plot_load_path_wrapper('05_Deploying\\data_out\\data_20260116_1510_casexx', case_study = '2D-3', until_load_level = [0,9], 
         #                        save_path = save_path, type = 'u', thresh = 10)
 
-        diagonal_loadpath_plot(path_depl, save_path = save_path, type = 'eps', thresh = 5)
+        # diagonal_loadpath_plot(path_depl, save_path = save_path, type = 'eps', thresh = 5)

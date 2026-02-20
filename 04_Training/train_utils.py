@@ -487,7 +487,8 @@ def simple_train(inp, model_dict, mat_data_TrainEvalTest, best_model_path, no = 
         y1 = mat_data_TrainEvalTest['y_train_tt'].to(device)
         y1e = mat_data_TrainEvalTest['y_eval_tt'].to(device)
         train_loader = None
-        model = simple_train_aux_(X1, y1, X1e, y1e, train_loader, model, optimizer, scheduler, lossFn, MAXEPOCHS, w_s, best_model_path, inp, no)
+        eval_loader = None
+        model = simple_train_aux_(X1, y1, X1e, y1e, train_loader, eval_loader, model, optimizer, scheduler, lossFn, MAXEPOCHS, w_s, best_model_path, inp, no)
 
     elif inp['batch_size'] is not None:
         batch_size = inp['batch_size']  # Set default batch size

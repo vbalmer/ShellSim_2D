@@ -2873,14 +2873,14 @@ def input_definition(mat, NN_hybrid):
             
             # nodal loads in y-direction
             Load_n[i]  = np.array([
-                            # tension / compression in x-direction
-                            [0,0,0+ms/2,B-ms/2,0,0,1,-Force_mag[i]*(ms/L)],
-                            [L,L,0+ms/2,B-ms/2,0,0,1,Force_mag[i]*(ms/L)],
+                            # tension / compression in y-direction
+                            [0+ms/2,L-ms/2,0,0,0,0,2,-Force_mag[i]*(ms/L)],
+                            [0+ms/2,L-ms/2,B,B,0,0,2,Force_mag[i]*(ms/L)],
 
-                            [0,0,0,0,0,0,1,-Force_mag[i]/2*(ms/L)],
-                            [L,L,0,0,0,0,1,Force_mag[i]/2*(ms/L)],
-                            [0,0,B,B,0,0,1,-Force_mag[i]/2*(ms/L)],
-                            [L,L,B,B,0,0,1,Force_mag[i]/2*(ms/L)],
+                            [0,0,0,0,0,0,2,-Force_mag[i]/2*(ms/L)],
+                            [L,L,0,0,0,0,2,-Force_mag[i]/2*(ms/L)],
+                            [0,0,B,B,0,0,2,Force_mag[i]/2*(ms/L)],
+                            [L,L,B,B,0,0,2,Force_mag[i]/2*(ms/L)],
 
                             #shear
                             [0+ms/2,L-ms/2,0,0,0,0,1,-Force_mag[i]*(ms/L)],
@@ -2899,7 +2899,7 @@ def input_definition(mat, NN_hybrid):
                             ])
         
     elif scenario == 113:
-    # pure tension /compression in x and y direction + shear
+    # pure compression in x and y direction + shear
 
         " 2.1 Output:    - Global Boundary Conditions "
         "                  [xmin,xmax,ymin,ymax,zmin,zmax,BC_ux,BC_uy,BC_uz,BC_thx,BC_thy,BC_thz]"
@@ -3052,6 +3052,83 @@ def input_definition(mat, NN_hybrid):
                             [L,L,B,B,0,0,2,Force_mag[i]/2*(ms/L)],
                             ])
 
+
+    elif scenario == 115:
+    # pure compression in x and y direction + shear
+
+        " 2.1 Output:    - Global Boundary Conditions "
+        "                  [xmin,xmax,ymin,ymax,zmin,zmax,BC_ux,BC_uy,BC_uz,BC_thx,BC_thy,BC_thz]"
+        "                   BC_i in unit length (mm), 1234 if DOF is free"
+
+        f = 1
+        BC = np.array(([
+                        [-f, f, -f, f, -f, f, 1234, 0,0,0,0,0],
+                        [L-f, L+f, -f, f, -f, f, 1234, 0,0,0,0,0],
+                        [L-f, L+f, B-f, B+f, -f, f, 0, 1234,0,0,0,0],
+                        ]))
+        
+        
+        " 2.2 Output:   - Load_el: Global Element Loads "
+        "                 [xmin,xmax,ymin,ymax,zmin,zmax,direction(x=1,y=2,z=3,thx=4,thy=5,thz=6),magnitude[N/mm2]]"
+        "               - Load_n: Global Nodal Loads"
+        "                 [xmin,xmax,ymin,ymax,zmin,zmax,direction(x=1,y=2,z=3,thx=4,thy=5,thz=6),magnitude[N]]"
+
+        
+        
+        if isinstance(Force_mag, np.ndarray): 
+            nls = len(Force_mag)
+            Load_el = [[]]*nls
+            Load_n = [[]]*nls
+        else: 
+            nls = 1
+            Force_mag = [Force_mag]
+            Load_el = [[]]*nls
+            Load_n = [[]]*nls
+
+        for i in range(nls):
+            # no element loads (magnitude = 0)
+            Load_el[i] = np.array([
+                        [0,L,0,B,0,0,3,0],
+                        ])
+
+            # nodal loads in y-direction
+            Load_n[i]  = np.array([
+                            # tension / compression in x-direction on all sides
+                            [0,0,0+ms/2,B-ms/2,0,0,1,-Force_mag[i]*(ms/L)],
+                            [L,L,0+ms/2,B-ms/2,0,0,1,Force_mag[i]*(ms/L)],
+
+                            # tension / compression in y-direction on all sides
+                            [0+ms/2,L-ms/2,0,0,0,0,2,-Force_mag[i]*(ms/L)],
+                            [0+ms/2,L-ms/2,B,B,0,0,2,Force_mag[i]*(ms/L)],
+
+                            # tension / compression in x-direction at edges
+                            [0,0,0,0,0,0,1,-Force_mag[i]/2*(ms/L)],
+                            [L,L,0,0,0,0,1,Force_mag[i]/2*(ms/L)],
+                            [0,0,B,B,0,0,1,-Force_mag[i]/2*(ms/L)],
+                            [L,L,B,B,0,0,1,Force_mag[i]/2*(ms/L)],
+
+                            # tension / compression in y-direction at edges
+                            [0,0,0,0,0,0,2,-Force_mag[i]/2*(ms/L)],
+                            [L,L,0,0,0,0,2,-Force_mag[i]/2*(ms/L)],
+                            [0,0,B,B,0,0,2,Force_mag[i]/2*(ms/L)],
+                            [L,L,B,B,0,0,2,Force_mag[i]/2*(ms/L)],
+
+                            # shear on all sides, but 2 times larger than nx and ny
+                            [0+ms/2,L-ms/2,0,0,0,0,1,-2*Force_mag[i]*(ms/L)],
+                            [0+ms/2,L-ms/2,B,B,0,0,1,2*Force_mag[i]*(ms/L)],
+                            [0,0,0+ms/2,B-ms/2,0,0,2,-2*Force_mag[i]*(ms/L)],
+                            [L,L,0+ms/2,B-ms/2,0,0,2,2*Force_mag[i]*(ms/L)],
+
+                            # shear at edges
+                            [0,0,0,0,0,0,1,-2*Force_mag[i]/2*(ms/L)],
+                            [L,L,0,0,0,0,1,-2*Force_mag[i]/2*(ms/L)],
+                            [0,0,B,B,0,0,1,2*Force_mag[i]/2*(ms/L)],
+                            [L,L,B,B,0,0,1,2*Force_mag[i]/2*(ms/L)],
+                            [0,0,0,0,0,0,2,-2*Force_mag[i]/2*(ms/L)],
+                            [0,0,B,B,0,0,2,-2*Force_mag[i]/2*(ms/L)],
+                            [L,L,0,0,0,0,2,2*Force_mag[i]/2*(ms/L)],
+                            [L,L,B,B,0,0,2,2*Force_mag[i]/2*(ms/L)],
+                            ])
 
 
     elif scenario == 10: 

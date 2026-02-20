@@ -25,7 +25,7 @@ path = os.path.join(os.getcwd(), '04_Training')
 path_plots = os.path.join(path, 'plots')
 # add_path = '_simple_logs\\v_339'            # for lin.el. RC material
 # add_path = '_simple_logs\\v_243'            # for glass
-add_path = '_simple_logs\\v_481'            # for RC, D-matrix
+add_path = '_simple_logs\\v_490'            # for RC, D-matrix
 # add_path = '_simple_logs\\v_221'            # for RC, only sig
 # add_path = '_simple_logs\\v_320'              # for RC, sig + D (!)
 # add_path = '_simple_logs\\v_279'              # for RC, MoE
@@ -46,7 +46,7 @@ REDUCE_DATASIZE = False
 # load model from checkpoint:
 inp = data_model['inp'] 
 print(inp)
-model_test_dict = test_model_instance(inp, path, v_num='481', epoch='_246')         # for lin.el. RC material
+model_test_dict = test_model_instance(inp, path, v_num='490', epoch='_247')         # for lin.el. RC material
 # model_test_dict = test_model_instance(inp, path, v_num='243', epoch='_19996')         # for glass
 # model_test_dict = test_model_instance(inp, path, v_num='221', epoch='_19929')         # for nonlin RC, sig
 # model_test_dict = test_model_instance(inp, path, v_num='220', epoch='_19882')         # for nonlin RC, D-matrix

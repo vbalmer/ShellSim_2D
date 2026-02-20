@@ -164,8 +164,10 @@ if PLOT_3D_SCATTER:
                                 # 'data_20260108_2137_fake',
                                 # 'data_20260108_1925_fake',
                                 # 'data_20260105_1416_fake',
-                                'data_20260113_1611_fake',
-                                'data_20260113_1403_fake',
+                                # 'data_20260113_1611_fake',
+                                # 'data_20260113_1403_fake',
+                                # 'data_20260109_1821_fake',
+                                'data_20260110_1141_fake'
                                 
 
                                           

@@ -106,7 +106,7 @@ def get_loadsteps(path_depl):
 
 def get_relevant_dim(case_study):
 
-    if case_study not in ['2D-1', '2D-2', '2D-3', '2D-4', '2D-5', '2D-1C', '2D-8C']:
+    if case_study not in ['2D-1', '2D-2', '2D-3', '2D-4', '2D-5', '2D-1C', '2D-8C', "0", "1", "2"]:
         raise UserWarning('TODO: Combination cases not yet implemented.')
 
     # mapping = {
@@ -124,8 +124,11 @@ def get_relevant_dim(case_study):
         "2D-3": [1],
         "2D-4": [0],
         "2D-5": [0],
-        "2D-1C": [2],
+        "2D-1C": [0,1,2],
         "2D-8C": [0,1,2],
+        "0": [0,2],                   # these are used for plotting in the paper format (in the data sensitivity plot)
+        "1": [0,2],
+        "2": [0,2],
     }
 
     relevant_dim = mapping.get(case_study)
@@ -411,10 +414,16 @@ def diagonal_loadpath_plot(path_depl, save_path, type = 'eps', thresh = 10):
         UserWarning('This function is not layed out to be used for single paths.')
     
 
-def calculate_errors_diagonal(mat_displ, key0, key1):
-    num_cols_plt = len(mat_displ[key0][key1]['NN'])
-    predictions = mat_displ[key0][key1]['NN']
-    Y = mat_displ[key0][key1]['NLFEA']
+def calculate_errors_diagonal(mat_displ, key0, key1, i = None):
+    if i is not None: 
+        num_cols_plt = len(mat_displ[key0][key1]['NN'][:,i])
+        predictions = mat_displ[key0][key1]['NN'][:,i]
+        Y = mat_displ[key0][key1]['NLFEA'][:,i]
+    else: 
+        num_cols_plt = len(mat_displ[key0][key1]['NN'])
+        predictions = mat_displ[key0][key1]['NN']
+        Y = mat_displ[key0][key1]['NLFEA']
+        i = 0
 
 
     ### Calculate errors
@@ -425,7 +434,6 @@ def calculate_errors_diagonal(mat_displ, key0, key1):
     rse, nrse, log_err = np.zeros((Y.shape[0], num_cols_plt)), np.zeros((Y.shape[0], num_cols_plt)), np.zeros((Y.shape[0], num_cols_plt))
 
 
-    i = 0
     Y_col = Y.reshape((1, -1))
     pred_col = predictions.reshape((1,-1))
     r_squared2[:,i] = np.corrcoef(Y_col, pred_col)[0, 1]**2

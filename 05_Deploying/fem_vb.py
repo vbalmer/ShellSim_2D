@@ -235,23 +235,28 @@ class fem_func():
         return D_new
 
     
-    def filter_small_stiffness(self, D_NN, k):
+    def filter_small_stiffness(self, D_NN, k, scenario):
         '''
-        Checks shear stiffness and removes too small values of shear stiffness to be replaced with G/100
+        Checks shear stiffness and removes too small values of shear stiffness to be replaced with G/10
         
         :param D_NN: (3x3) matrix (D_m)
         :param k: Element number
+        :param scenario: Boundary conditions
         '''
         if D_NN.shape != (3,3):
             raise UserWarning('If D_NN does not have shape (3,3), this function will lead to erroneous results. Please adjust function or redo calculation.')
 
-        ff = self.MATK["Ec"][k]/10
-        D_p_min = np.array([[ff, 0, 0], [0, ff, 0], [0, 0, ff/2]])
-        D_min = self.GEOMK["t"][k]*D_p_min
+        if scenario not in [8, 9, 109, 110, 111, 112]:
+            # only apply shear stiffness reduction for base cases and combination cases which don't include any shear strains.
+            pass
+        else:
+            ff = self.MATK["Ec"][k]/10
+            D_p_min = np.array([[ff, 0, 0], [0, ff, 0], [0, 0, ff/2]])
+            D_min = self.GEOMK["t"][k]*D_p_min
 
-        if D_NN[2,2] < D_min[2,2]:
-            D_NN[2,2] = D_min[2,2]
-        
+            if D_NN[2,2] < D_min[2,2]:
+                D_NN[2,2] = D_min[2,2]
+
         return D_NN
 
 
@@ -1511,7 +1516,7 @@ class fem_func():
             print(Jdet)
         return Ke, De_
 
-    def k_k_nn_num(self,Bm_k,Bb_k,Bs_k,Jdet_k,eh_k,sh_k, e_k,s_k, k, cm_k, model_dim):
+    def k_k_nn_num(self,Bm_k,Bb_k,Bs_k,Jdet_k,eh_k,sh_k, e_k,s_k, k, cm_k, model_dim, scenario):
         '''
         Determines k_k for NNs that only predict sub-parts of D-matrix
         '''
@@ -1575,7 +1580,7 @@ class fem_func():
                 self.check_range_NN(D_pred,'D', cmk = self.MATK["cm"][k])
                 D = transf_units(D_pred, 'D', forward = False, linel=False)
                 De_NN = D[0,:,:]
-                De_NN[0:3,0:3] = self.filter_small_stiffness(De_NN[0:3,0:3],k)
+                De_NN[0:3,0:3] = self.filter_small_stiffness(De_NN[0:3,0:3],k, scenario)
                 ######## calculate D numerically ########
                 Dmh,Dmbh,Dbh,Dsh = self.dh_kij(e_k[:,i,j,:],s_k[:,i,j], k, i, j, cm_k)
                 De_1 = np.hstack([Dmh,Dmbh,np.zeros((3, 2))])
@@ -1706,7 +1711,7 @@ class fem_func():
         time_K._updatetime(delta_t=end - start)
         return K, D_tot
     
-    def k_glob_nn_num(self, B, e, s, eh, sh, cmk, model_dim):
+    def k_glob_nn_num(self, B, e, s, eh, sh, cmk, model_dim, scenario):
         """ --------------------- Create global stiffness matrix (partly NN, partly numerical)---------------------------
             --------------------------------------------    INPUT: ------------------------------------------------------
             - u: Global displacement vector
@@ -1734,7 +1739,7 @@ class fem_func():
             sh_k = sh[k,:,:,:]
             e_k = e[k,:,:,:]
             s_k = s[k]
-            Ke, De = self.k_k_nn_num(B["Bm"]["r"][k],B["Bb"]["r"][k],B["Bs"]["r"][k],B["Jdet"][k],eh_k,sh_k,e_k, s_k, k, cmk[k], model_dim)
+            Ke, De = self.k_k_nn_num(B["Bm"]["r"][k],B["Bb"]["r"][k],B["Bs"]["r"][k],B["Jdet"][k],eh_k,sh_k,e_k, s_k, k, cmk[k], model_dim, scenario)
 
             nodes = self.ELEMENTS[k, :][self.ELEMENTS[k, :] < 10**5]
             """------------------------------------ Assemble to global Stiffness Matrix ---------------------------------""" 
@@ -2925,7 +2930,7 @@ class fem_func():
 
         return u, D_tot
 
-    def solve_sys_nn_num(self, B,fe, cDOF,cVAL, cmk,eh,sh, e,s, model_dim):
+    def solve_sys_nn_num(self, B,fe, cDOF,cVAL, cmk,eh,sh, e,s, model_dim, scenario):
         """ ------------------------------------------- Solve System ----------------------------------------------------
             --------------------------------------------    INPUT: ------------------------------------------------------
             - cmk: Constitutive model to be applied
@@ -2937,7 +2942,7 @@ class fem_func():
             - K     --> Stiffness Matrix of current iteration step
         -----------------------------------------------------------------------------------------------------------------"""
         # K, Ke_tot = self.k_glob(B,e,s, cmk)
-        K, D_tot = self.k_glob_nn_num(B,e, s, eh,sh, cmk, model_dim)
+        K, D_tot = self.k_glob_nn_num(B,e, s, eh,sh, cmk, model_dim, scenario)
 
         Kcond = self.m_stat_con(K, cDOF)
         fecond = self.v_stat_con(fe, cDOF, cVAL)
