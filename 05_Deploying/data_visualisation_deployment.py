@@ -9,6 +9,7 @@ from Plot_NoDash import main_plt_comp, main_plt, contour_perit
 from stress_paths_plots import *
 from load_paths_plots import *
 from data_work import plotting_sampled_scatter_2D               # the error can be shown here, it still works below.
+from plots_paper_utils import save_errors_to_excel
 
 ##################################################
 # Definition of input parameters
@@ -24,7 +25,8 @@ D_PLOTS = False
 SIG_PLOTS = False
 U_PLOTS = False
 STRESS_PATHS = False
-LOAD_PATH = True
+LOAD_PATH = False
+MAX_VALS_APP = True
 
 PCA_PLOTS = False
 DIAG_PLOTS = False
@@ -540,11 +542,84 @@ if LOAD_PATH:
         # plot_load_path_wrapper(path_depl, case_study = '2D-1C', until_load_level = [1,18], 
         #                        save_path = save_path, type = 'eps', thresh = 5)
         
-        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260220_1904_casexx', case_study = '2D-1C', until_load_level = [0,4], 
-                               save_path = save_path, type = 'u', thresh = 10)
+        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260220_1935_casexx', case_study = '2D-1C', until_load_level = [0,8], 
+                               save_path = save_path, type = 'eps', thresh = 10)
 
         
         # plot_load_path_wrapper('05_Deploying\\data_out\\data_20260116_1510_casexx', case_study = '2D-3', until_load_level = [0,9], 
         #                        save_path = save_path, type = 'u', thresh = 10)
 
         # diagonal_loadpath_plot(path_depl, save_path = save_path, type = 'eps', thresh = 5)
+
+if MAX_VALS_APP:
+        # note: the path_depl_all contains two values per case study and per rho: 
+        # 1 - path to deployment data; 2- amount of loadsteps to consider
+        path_depl_all = {
+                '2D-1': {
+                        '$\\rho_y$ = 1\%': ['data_20260119_0803_casexx', 12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260120_1817_casexx', 8],
+                        '$\\rho_y$ = 1.5\%': ['data_20260120_1637_casexx', 10],
+                },
+               '2D-2': {
+                        '$\\rho_y$ = 1\%': ['data_20260120_0836_casexx', 12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260121_1038_casexx', 9],
+                        '$\\rho_y$ = 1.5\%': ['data_20260120_1945_casexx', 12],
+                },
+                '2D-3': {
+                        '$\\rho_y$ = 1\%': ['data_20260120_1008_casexx', 8],
+                        '$\\rho_y$ = 0.75\%': ['data_20260121_1422_casexx', 5],
+                        '$\\rho_y$ = 1.5\%': ['data_20260120_1447_casexx', 10],
+                },
+                '2D-4': {
+                        '$\\rho_y$ = 1\%': ['data_20260120_1037_casexx', 12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260121_1251_casexx', 12],
+                        '$\\rho_y$ = 1.5\%': ['data_20260121_1131_casexx', 12],
+                },
+                '2D-5': {
+                        '$\\rho_y$ = 1\%': ['data_20260120_1210_casexx', 8],
+                        '$\\rho_y$ = 0.75\%': ['data_20260121_1356_casexx', 8],
+                        '$\\rho_y$ = 1.5\%': ['data_20260121_1549_casexx', 8],
+                },
+                '2D-1C': {
+                        '$\\rho_y$ = 1\%': ['data_20260210_1125_casexx', 12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260219_1340_casexx',10],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_0917_casexx',7],
+                },
+               '2D-2C': {
+                        '$\\rho_y$ = 1\%': ['data_20260210_1549_casexx', 12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260219_1821_casexx', 11],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_1034_casexx',12],
+                },
+                '2D-3C': {
+                        '$\\rho_y$ = 1\%': ['data_20260211_0959_casexx', 9],
+                        '$\\rho_y$ = 0.75\%': ['data_20260220_1117_casexx', 7],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_0847_casexx', 6],
+                },
+                '2D-4C': {
+                        '$\\rho_y$ = 1\%': ['data_20260211_1029_casexx', 8],
+                        '$\\rho_y$ = 0.75\%': ['data_20260220_1316_casexx', 6],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_1331_casexx', 6],
+                },
+                '2D-5C': {
+                        '$\\rho_y$ = 1\%': ['data_20260216_1133_casexx', 8],
+                        '$\\rho_y$ = 0.75\%': ['data_20260220_1357_casexx', 6],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_1621_casexx', 8],
+                },
+                '2D-6C': {
+                        '$\\rho_y$ = 1\%': ['data_20260218_1303_casexx', 5],
+                        '$\\rho_y$ = 0.75\%': ['data_20260220_1904_casexx', 4],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_1803_casexx', 7],
+                },
+                '2D-7C': {
+                        '$\\rho_y$ = 1\%': ['data_20260216_1214_casexx', 7],
+                        '$\\rho_y$ = 0.75\%': ['data_20260220_1935_casexx', 7],
+                        '$\\rho_y$ = 1.5\%': ['data_20260218_1735_casexx', 7],
+                },
+                '2D-8C': {
+                        '$\\rho_y$ = 1\%': ['data_20260129_1809_casexx',12],
+                        '$\\rho_y$ = 0.75\%': ['data_20260130_1125_casexx',9],
+                        '$\\rho_y$ = 1.5\%': ['data_20260130_0925_casexx',13],
+                },
+        }
+
+save_errors_to_excel(path_depl_all)

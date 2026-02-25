@@ -19,8 +19,11 @@ import wandb
 from matplotlib.patches import ConnectionStyle
 from matplotlib.transforms import IdentityTransform
 
+import pandas as pd
+import openpyxl
+
 from stress_paths_plots import sample_idx_eps, calculate_sig_D_NLFEA, predict_sig_D_NN
-from load_paths_plots import plot_load_paths, trim_vectors, get_loadsteps, get_max_eps, calculate_errors_diagonal
+from load_paths_plots import plot_load_paths, trim_vectors, get_loadsteps, get_max_eps, calculate_errors_diagonal, get_max_displ
 
 
 
@@ -1491,3 +1494,80 @@ def plot_sensitivity(path_data, path_deployment, save_path, thresh):
 
 
     return
+
+
+
+'''.......................... SAVING ERRORS ..........................'''
+
+def save_errors_to_excel(path_depl_all):
+    mat_displ = {}
+    mat_eps = {}
+    errors_displ = {}
+    errors_eps = {}
+
+    for key0 in path_depl_all.keys():
+        mat_displ[key0] = {}
+        mat_eps[key0] = {}
+        errors_displ[key0] = {}
+        errors_eps[key0] = {}
+        for key1 in path_depl_all[key0].keys():
+            path_here = '05_Deploying\\data_out\\'+path_depl_all[key0][key1][0]
+            index = path_depl_all[key0][key1][1]
+
+            load_steps = get_loadsteps(path_here)[:index]
+            displ_NN    = get_max_displ([0,1], load_steps, path_here, tag = 'NN')
+            displ_NLFEA = get_max_displ([0,1], load_steps, path_here, tag = 'norm')
+            mat_displ[key0][key1] = {
+                    'NN': displ_NN,
+                    'NLFEA': displ_NLFEA
+            }
+            eps_NN    = get_max_eps([0,1,2], load_steps, path_here, tag = 'NN')
+            eps_NLFEA = get_max_eps([0,1,2], load_steps, path_here, tag = 'norm')
+            mat_eps[key0][key1] = {
+                    'NN': eps_NN,
+                    'NLFEA': eps_NLFEA
+            }
+        print('Collected all eps and u data.')
+        for key1 in path_depl_all[key0].keys():
+            errors_displ[key0][key1] = [[],[]]
+            errors_eps[key0][key1] = [[],[],[]]
+            for i in range(2):
+                    e = calculate_errors_diagonal(mat_displ, key0, key1, i)
+                    errors_displ[key0][key1][i] = e['rmse'][0][i]
+            for i in range(3):
+                    e = calculate_errors_diagonal(mat_eps, key0, key1, i)
+                    errors_eps[key0][key1][i] = e['rmse'][0][i]
+        print('Calculated all RMSE')
+                    
+    export_to_excel(errors_displ, 'u')
+    export_to_excel(errors_eps, 'eps')
+    
+    return
+
+
+def export_to_excel(data, id):  
+        if id == 'eps':
+            sub_headers = ["εx", "εy", "γxy"]
+        elif id == 'u':
+            sub_headers = ["ux", "uy"]
+        rho_labels = ["ρ_y = 1%", "ρ_y = 0.75%", "ρ_y = 1.5%"]
+
+        # Build MultiIndex columns
+        columns = pd.MultiIndex.from_product(
+        [rho_labels, sub_headers]
+        )
+
+        # Build rows
+        rows = []
+        for _, rho_dict in data.items():
+                row_vals = [val for vals in rho_dict.values() for val in vals]
+                rows.append(row_vals) 
+
+        df = pd.DataFrame(rows, index=data.keys(), columns=columns)
+
+        # Export to Excel — MultiIndex columns become merged header rows automatically
+        df.to_excel("05_Deploying\\error_calc_"+id+".xlsx", merge_cells=True)
+        print(f'Saved excel for {id}')
+        return
+
+

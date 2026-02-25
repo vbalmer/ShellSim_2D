@@ -12,3 +12,4 @@ wandb_figures_published
 *.svg
 *.pdf
 *.json
+*.pyc
