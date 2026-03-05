@@ -45,7 +45,7 @@ COPY = True
 # GEOM = np.array([250, 0.015, 2])
 
 path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_480')
-path_depl = '05_Deploying\\data_out\\data_20260217_1119_casexx\\50'
+path_depl = '05_Deploying\\data_out\\data_20260305_1114_casexx\\1000'
 save_path = '05_Deploying\\plots\\test'
 
 
@@ -542,7 +542,7 @@ if LOAD_PATH:
         # plot_load_path_wrapper(path_depl, case_study = '2D-1C', until_load_level = [1,18], 
         #                        save_path = save_path, type = 'eps', thresh = 5)
         
-        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260220_1935_casexx', case_study = '2D-1C', until_load_level = [0,8], 
+        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260305_1114_casexx', case_study = '2D-1C', until_load_level = [0,6], 
                                save_path = save_path, type = 'eps', thresh = 10)
 
         
@@ -550,6 +550,7 @@ if LOAD_PATH:
         #                        save_path = save_path, type = 'u', thresh = 10)
 
         # diagonal_loadpath_plot(path_depl, save_path = save_path, type = 'eps', thresh = 5)
+
 
 if MAX_VALS_APP:
         # note: the path_depl_all contains two values per case study and per rho: 
@@ -582,7 +583,7 @@ if MAX_VALS_APP:
                 },
                 '2D-1C': {
                         '$\\rho_y$ = 1\%': ['data_20260210_1125_casexx', 12],
-                        '$\\rho_y$ = 0.75\%': ['data_20260219_1340_casexx',10],
+                        '$\\rho_y$ = 0.75\%': ['data_20260305_1114_casexx',10],
                         '$\\rho_y$ = 1.5\%': ['data_20260218_0917_casexx',7],
                 },
                '2D-2C': {
@@ -622,4 +623,4 @@ if MAX_VALS_APP:
                 },
         }
 
-save_errors_to_excel(path_depl_all)
+        save_errors_to_excel(path_depl_all)

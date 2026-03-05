@@ -346,13 +346,13 @@ def final_touches_diag_scatter(axs):
     # set labels
     pad = 2
     axs[0].set_xlabel(r'$n_x$ [MN/m]', labelpad = pad)
-    axs[0].set_ylabel(r'$\tilde{n}_x$ [MN/m]', labelpad = pad)
+    axs[0].set_ylabel(r'$n_{x,pred}$ [MN/m]', labelpad = pad)
     axs[1].set_xlabel(r'$n_y$ [MN/m]', labelpad = pad)
-    axs[1].set_ylabel(r'$\tilde{n}_y$ [MN/m]', labelpad = pad)
+    axs[1].set_ylabel(r'$n_{y,pred}$ [MN/m]', labelpad = pad)
     axs[2].set_xlabel(r'$D_{m,11}$ [GN/m]', labelpad = pad)
-    axs[2].set_ylabel(r'$\tilde{D}_{m,11}$ [GN/m]', labelpad = pad)
+    axs[2].set_ylabel(r'$D_{m,11,pred}$ [GN/m]', labelpad = pad)
     axs[3].set_xlabel(r'$D_{m,12}$ [GN/m]', labelpad = pad)
-    axs[3].set_ylabel(r'$\tilde{D}_{m,12}$ [GN/m]', labelpad = pad)
+    axs[3].set_ylabel(r'$D_{m,12,pred}$ [GN/m]', labelpad = pad)
     
     # add grid
     for i in range(6):
