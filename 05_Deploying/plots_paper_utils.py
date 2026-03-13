@@ -18,6 +18,7 @@ from matplotlib.patches import FancyArrowPatch
 import wandb
 from matplotlib.patches import ConnectionStyle
 from matplotlib.transforms import IdentityTransform
+from matplotlib.path import Path
 
 import pandas as pd
 import openpyxl
@@ -492,11 +493,17 @@ def plot_physics_influence(ax, mat_data):
 
     ax.annotate('NN v480', 
         xy=(mat_data['points'][0]*1e3, mat_data['sobolev_rmse'][0]*1e-3),              # Point to annotate
-        xytext=(mat_data['points'][0]*1e3-2.7e6, mat_data['sobolev_rmse'][0]*1e-3+0.07),          # Where to place the text
-        arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=-0.3', lw=0.25),
-        bbox=dict(boxstyle='round', facecolor=(1,1,1,0.5), edgecolor='lightgrey', 
-              linewidth=0.5))
+        xytext=(mat_data['points'][0]*1e3-2.7e6, mat_data['sobolev_rmse'][0]*1e-3+0.06),          # Where to place the text
+        bbox=dict(boxstyle='round', facecolor=(1,1,1,0.5), edgecolor='lightgrey', linewidth=0.5))
 
+    arrow1 = FancyArrowPatch(
+            (mat_data['points'][0]*1e3-1e6, mat_data['sobolev_rmse'][0]*1e-3+0.05),     # Where to place the arrow start
+            (mat_data['points'][0]*1e3, mat_data['sobolev_rmse'][0]*1e-3),                 # Where to place the arrow end
+            arrowstyle="Simple,head_length=4,head_width=2,tail_width=0.25",
+            connectionstyle='arc3,rad=-0.3', 
+            color = "black",
+            lw=0.25)
+    ax.add_patch(arrow1)
 
     return
 
@@ -622,7 +629,7 @@ def add_subplot_number_depl(axs):
                 fontsize=8, fontweight='bold', va='top', ha='left', clip_on=False)
     return
 
-def plot_base_cases(axs, path_depl, thresh, calculate_tangent, type_ = 'eps', color = None):
+def plot_base_cases(axs, path_depl, thresh, calculate_tangent=False, type_ = 'eps', color = None):
     load_steps = {}
     mat_displ = {}
     errors = {}
@@ -1312,8 +1319,8 @@ def add_arrows(axs):
                   [-0.35, -0.2],
                   [-0.35, -0.2]]
     t_n = [[0.99, 0.99], 
-           [0.99, 0.9], 
-           [0.99, 0.9]]
+           [0.99, 0.92], 
+           [0.99, 0.92]]
     
     for i in range(3):
         for start, end, label, rad, t_i in zip(starts[i], ends[i], labels[i], curvatures[i], t_n[i]):
@@ -1352,13 +1359,20 @@ def place_arrowhead(start, end, rad, t, head_length_pts):
     
     # Adjust t backward to account for arrowhead length
     if t<0.95:
-        t_adjusted = t - 0.08  # Tune this value (try 0.01 to 0.05)
+        t_adjusted = t - 0.06  # Tune this value (try 0.01 to 0.05)
     else: 
         t_adjusted = t-0.02
     
     mid = (1-t_adjusted)**2 * P0 + 2*(1-t_adjusted)*t * P1 + t_adjusted**2 * P2
     return mid
 
+
+# def triangle_marker(ratio=2):
+#     verts = np.array([[0, -0.5], [1, 0], [0, 0.5]])  # pointing right
+#     verts[:, 1] *= ratio  # stretch height
+#     verts -= verts.mean(axis=0)  # center
+#     codes = [Path.MOVETO, Path.LINETO, Path.CLOSEPOLY]
+#     return Path(verts, codes)
 
 
 ''' ..........................  MAIN FUNCTIONS .......................... '''

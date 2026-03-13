@@ -6,8 +6,8 @@ import os
 save_path = os.path.join(os.getcwd(), '05_Deploying\\plots\\test')
 SCATTER = False
 PLOT_TRAINING = False
-PLOT_DEPLOYING = True
-PLOT_DATA_SENSITIVITY = False
+PLOT_DEPLOYING = False
+PLOT_DATA_SENSITIVITY = True
 
 
 
