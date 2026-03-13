@@ -5,8 +5,8 @@ import os
 
 save_path = os.path.join(os.getcwd(), '05_Deploying\\plots\\test')
 SCATTER = False
-PLOT_TRAINING = True
-PLOT_DEPLOYING = False
+PLOT_TRAINING = False
+PLOT_DEPLOYING = True
 PLOT_DATA_SENSITIVITY = False
 
 
@@ -43,7 +43,7 @@ if PLOT_DEPLOYING:
         }
 
 
-    plot_deploying_results(path_depl, save_path, thresh = 2.5)
+    plot_deploying_results(path_depl, save_path, thresh = 2.5, calculate_tangent = True)
 
 
 if PLOT_DATA_SENSITIVITY: 

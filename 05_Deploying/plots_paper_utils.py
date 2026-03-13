@@ -622,7 +622,7 @@ def add_subplot_number_depl(axs):
                 fontsize=8, fontweight='bold', va='top', ha='left', clip_on=False)
     return
 
-def plot_base_cases(axs, path_depl, thresh, type_ = 'eps', color = None):
+def plot_base_cases(axs, path_depl, thresh, calculate_tangent, type_ = 'eps', color = None):
     load_steps = {}
     mat_displ = {}
     errors = {}
@@ -670,6 +670,13 @@ def plot_base_cases(axs, path_depl, thresh, type_ = 'eps', color = None):
             else: 
                 # deployment plot:
                 plot_individual_base_case(axs[i], key0, load_steps, mat_displ, thresh)
+                if calculate_tangent:
+                    for key1 in path_depl[key0].keys():
+                        delta_strain = (mat_displ[key0][key1]['NLFEA'][-1]-mat_displ[key0][key1]['NLFEA'][-2])
+                        delta_force = (load_steps[key0][key1][-1]-load_steps[key0][key1][-2])
+                        D_tangent = delta_force/delta_strain
+                        print(f'For the last two loadsteps in case {key0} with {key1} delta_eps = {delta_strain:.2f} and delta_f = {delta_force:.2f}')
+                        print(f'For the last two loadsteps in case {key0} with {key1} D_tangent = {D_tangent:.2f}')
                 
 
     return
@@ -810,6 +817,11 @@ def plot_individual_diagonal_base_case(ax, key0, load_steps, mat_displ, errors):
                 alpha=0.8
             )
         )
+    
+    for key1 in keys1:
+        max_eps = mat_displ[key0][key1]['NLFEA'][-1]
+        rmse = errors[key0][key1]['rmse'][0][0]
+        print(f'The maximum relative error for case {key0} and {key1} is {(rmse/max_eps):.2f}')
 
     return
 
@@ -941,6 +953,16 @@ def plot_case_2D8C_slim(ax, path_depl_2D8C):
                     marker = 'o', markerfacecolor = 'none', markeredgewidth=0.5, ms = 3, lw = 0.5, linestyle = 'solid', label = 'NLFEA, ' +key)
             ax[i].plot(mat_displ[key]['NN'][:,i], np.abs(load_steps[key])*unit_s, color = colors[k], 
                     marker = 'x', ms = 3, markeredgewidth=0.5, lw = 0.5, linestyle = '--', label = 'NN, ' +key)
+            
+
+    # 4 - Determine the tangent stiffness
+    for i in range(3):
+        for key1 in path_depl_2D8C.keys():
+            delta_strain = (mat_displ[key1]['NLFEA'][-1,i]-mat_displ[key1]['NLFEA'][-2,i])
+            delta_force = (load_steps[key1][-1]-load_steps[key1][-2])
+            D_tangent = delta_force/delta_strain
+            print(f'For the last two loadsteps in case 2D-8C and direction {i} with {key1} delta_eps = {delta_strain:.2f} and delta_f = {delta_force:.2f}')
+            print(f'For the last two loadsteps in case 2D-8C and direction {i} with {key1} D_tangent = {D_tangent:.2f}')
 
     
 
@@ -1014,9 +1036,9 @@ def plot_diag_2D8C(ax, path_depl_2D8C, thresh, type_ = 'eps'):
 
         ax[i].text(
                 0.05, 0.95,                 # x,y position in axes coordinates (0–1)
-                f"$e_{{\\uprho_y = 0.75\\%}}$: {np.round(errors[key0][keys1[0]][str(i)]['rmse'][0][0], 2)}\n"
-                f"$e_{{\\uprho_y = 1.00\\%}}$: {np.round(errors[key0][keys1[1]][str(i)]['rmse'][0][0], 2)}\n"
-                f"$e_{{\\uprho_y = 1.50\\%}}$: {np.round(errors[key0][keys1[2]][str(i)]['rmse'][0][0], 2)}",
+                f"$e_{{\\uprho_y = 0.75\\%}}$: {np.round(errors[key0][keys1[0]][str(i)]['rmse'][0][i], 2)}\n"
+                f"$e_{{\\uprho_y = 1.00\\%}}$: {np.round(errors[key0][keys1[1]][str(i)]['rmse'][0][i], 2)}\n"
+                f"$e_{{\\uprho_y = 1.50\\%}}$: {np.round(errors[key0][keys1[2]][str(i)]['rmse'][0][i], 2)}",
                 transform=ax[i].transAxes,     # makes coordinates relative to the axes
                 verticalalignment="top",
                 bbox=dict(
@@ -1027,6 +1049,11 @@ def plot_diag_2D8C(ax, path_depl_2D8C, thresh, type_ = 'eps'):
                     alpha=0.8
                 )
             )
+        
+        for key1 in keys1:
+            max_eps = mat_displ[key0][key1]['NLFEA'][-1,i]
+            rmse = errors['2D-8C'][key1][str(i)]['rmse'][0][i]
+            print(f'The maximum relative error for case 2D-8C in direction {i} and with {key1} is {(rmse/max_eps):.2f}')
         
     return
 
@@ -1414,7 +1441,7 @@ def plot_training_results(NN, save_path= None, include_predict = False):
     return
     
 
-def plot_deploying_results(path_depl, save_path, thresh):
+def plot_deploying_results(path_depl, save_path, thresh, calculate_tangent):
 
     # 1 - create figure
     setup_figure_format()
@@ -1424,7 +1451,7 @@ def plot_deploying_results(path_depl, save_path, thresh):
     fig, axs = add_subplots_gs_depl(fig, gs)
 
     # 2a - plot base cases load-def.
-    plot_base_cases(axs[0:3], path_depl, thresh)
+    plot_base_cases(axs[0:3], path_depl, thresh, calculate_tangent)
     final_touches_base_cases(fig, axs[0:3])
 
     # 2b - plot base cases diagonal
