@@ -49,7 +49,7 @@ TWODIM = True
 UNIFORM_S = False                                      # sample uniformly for cube (not for log-data)
 t = [300]
 rho_x = [0.025]
-rho_y = [0.0375]
+rho_y = [0.025]
 CC = [1]
 num_layer = 20                                      # [-]                 
 nu_1 = 0                                            # [-]
@@ -75,7 +75,7 @@ material = 3                # 3 = Reinforced concrete
 
 
 ################################## SAMPLER DEFINITION ###########################################
-
+t0 = time.perf_counter()
 # Sample the data
 analytical_sampler = Sampler_utils_vb(E1 = None, nu1=nu_1, E2=None, nu2=None, mat_dict = mat_dict)
 if rho_y is None:
@@ -119,8 +119,9 @@ else:
 # if sampling range given with eps_xy instead of gamma_xy
 eps[:,2] = 2*eps[:,2]
 
-
+print(f'time sampling eps and t: {(time.perf_counter()-t0)/60:.2f}min')
 print('Sampled eps and t.')
+t1 = time.perf_counter()
 if not TWODIM:
     t_extended = analytical_sampler.extend_material_parameters(t)       # contains [t, rho, CC, Ec, tb0, tb1, ect, ec0, fcp, fct] 
     if rho_x != rho_y: 
@@ -132,11 +133,12 @@ else:
 
 calc_method = 'single'
 if n_samples < (1e6+1):
-    t0 = time.time()
+    # t0 = time.time()
     dict_sampler = analytical_sampler.D_an(np.array(eps), t_extended, num_layers=num_layer, mat = material, calc_meth=calc_method, 
                                         discrete='andreas', rho_sublayer = rho_sublayer)
-    t1 = time.time()
-    print('Time for calculating sig, D: ', t1-t0)
+    # t1 = time.time()
+    # print('Time for calculating sig, D: ', t1-t0)
+    print(f'Time for calculating sig, D: {(time.perf_counter()-t1)/60:.2f}min')
     sig_a = dict_sampler['sig_a']
     D_a = dict_sampler['D_a']
 
