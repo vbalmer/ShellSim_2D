@@ -1242,7 +1242,7 @@ def final_touches_scatter_sensitivity(fig, axs, nrows = 3):
 
 def final_touches_sensitivity_depl(fig, axs, nrows = 3):
     for i in range(nrows):
-        axs[i,0].set_xlabel(r'$\hat{\upvarepsilon}$ [\textperthousand]', labelpad = 1)
+        axs[i,0].set_xlabel(r'$\hat{\upvarepsilon}_x, \hat{\gamma}_{xy}$ [\textperthousand]', labelpad = 1)
         axs[i,0].set_ylabel(r'$n_x$ [MN/m]', labelpad = 1)
     
 
@@ -1304,7 +1304,7 @@ def plot_individual_base_case_sensitivity(ax, key0, load_steps, mat_displ, thres
 
     return
 
-def add_arrows(axs):
+def add_arrows(axs, colors):
     axs = axs.ravel()
     starts = [[(2.5, 0.5), (1.5, 0.4)],
               [(2.5, 0.5), (1.5, 0.4)],
@@ -1312,9 +1312,9 @@ def add_arrows(axs):
     ends = [[(1.3, 0.94), (0, 0.94)],
             [(1.3, 0.94), (0, 0.94)],
             [(1.3, 0.94), (0, 0.94)]]
-    labels = [[r"$f(\hat{\upvarepsilon}_x)$", r"$f(\hat{\upgamma}_{xy})$"],
-              [r"$f(\hat{\upvarepsilon}_x)$", r"$f(\hat{\upgamma}_{xy})$"],
-              [r"$f(\hat{\upvarepsilon}_x)$", r"$f(\hat{\upgamma}_{xy})$"]]
+    labels = [[r"$\hat{\upvarepsilon}_x$", r"$\hat{\upgamma}_{xy}$"],
+              [r"$\hat{\upvarepsilon}_x$", r"$\hat{\upgamma}_{xy}$"],
+              [r"$\hat{\upvarepsilon}_x$", r"$\hat{\upgamma}_{xy}$"]]
     curvatures = [[-0.35, -0.2],
                   [-0.35, -0.2],
                   [-0.35, -0.2]]
@@ -1322,6 +1322,8 @@ def add_arrows(axs):
            [0.99, 0.92], 
            [0.99, 0.92]]
     
+    color = [x[0] for x in colors]
+
     for i in range(3):
         for start, end, label, rad, t_i in zip(starts[i], ends[i], labels[i], curvatures[i], t_n[i]):
             rad = rad
@@ -1347,7 +1349,7 @@ def add_arrows(axs):
             )
 
             axs[i].add_patch(arrow2)
-            axs[i].text(*start, label, ha = 'left', color = 'gray')
+            axs[i].text(*start, label, ha = 'left', color = color[i])
 
 def place_arrowhead(start, end, rad, t, head_length_pts):
     # Compute Bezier points
@@ -1525,7 +1527,7 @@ def plot_sensitivity(path_data, path_deployment, save_path, thresh):
     color = [['black'], [get_colorscale(2)[1]], [get_colorscale(2)[0]]]
     plot_base_cases(axs[0:3,4], path_deployment, thresh, type_ = 'eps', color=color)
     final_touches_sensitivity_depl(fig, axs[0:3,4:5])
-    add_arrows(axs[0:3,4:5])
+    add_arrows(axs[0:3,4:5], color)
 
 
 
