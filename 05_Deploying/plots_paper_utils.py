@@ -1547,12 +1547,16 @@ def save_errors_to_excel(path_depl_all):
     mat_eps = {}
     errors_displ = {}
     errors_eps = {}
+    max_vals_eps = {}
+    max_vals_displ = {}
 
     for key0 in path_depl_all.keys():
         mat_displ[key0] = {}
         mat_eps[key0] = {}
         errors_displ[key0] = {}
         errors_eps[key0] = {}
+        max_vals_eps[key0] = {}
+        max_vals_displ[key0] = {}
         for key1 in path_depl_all[key0].keys():
             path_here = '05_Deploying\\data_out\\'+path_depl_all[key0][key1][0]
             index = path_depl_all[key0][key1][1]
@@ -1581,17 +1585,26 @@ def save_errors_to_excel(path_depl_all):
                     e = calculate_errors_diagonal(mat_eps, key0, key1, i)
                     errors_eps[key0][key1][i] = e['rmse'][0][i]
         print('Calculated all RMSE')
+
+        for key1 in path_depl_all[key0].keys():
+            max_vals_displ[key0][key1] = [[],[]]
+            max_vals_eps[key0][key1] = [[],[],[]]
+            for i in range(3):
+                max_vals_eps[key0][key1][i] = get_max_reached_vals(mat_eps[key0][key1]['NLFEA'], i)
+            for i in range(2):
+                max_vals_displ[key0][key1][i] = get_max_reached_vals(mat_displ[key0][key1]['NLFEA'], i)
+        print('Fetched all maximum Values')
                     
-    export_to_excel(errors_displ, 'u')
-    export_to_excel(errors_eps, 'eps')
+    export_to_excel(errors_displ, max_vals_displ, 'u')
+    export_to_excel(errors_eps, max_vals_eps, 'eps')
     
     return
 
 
-def export_to_excel(data, id):  
-        if id == 'eps':
+def export_to_excel(data1, data2, id):  
+        if id == 'eps' or id == 'eps_max':
             sub_headers = ["εx", "εy", "γxy"]
-        elif id == 'u':
+        elif id == 'u' or id == 'u_max':
             sub_headers = ["ux", "uy"]
         rho_labels = ["ρ_y = 1%", "ρ_y = 0.75%", "ρ_y = 1.5%"]
 
@@ -1599,14 +1612,20 @@ def export_to_excel(data, id):
         columns = pd.MultiIndex.from_product(
         [rho_labels, sub_headers]
         )
-
-        # Build rows
+        
         rows = []
-        for _, rho_dict in data.items():
-                row_vals = [val for vals in rho_dict.values() for val in vals]
-                rows.append(row_vals) 
+        row_index = []
+        for key in data1.keys():
+            row_vals1 = [val for vals in data1[key].values() for val in vals]
+            rows.append(row_vals1)
+            row_index.append(key)
 
-        df = pd.DataFrame(rows, index=data.keys(), columns=columns)
+            row_vals2 = [val for vals in data2[key].values() for val in vals]
+            rows.append(row_vals2)
+            row_index.append(key)
+
+
+        df = pd.DataFrame(rows, index=row_index, columns=columns)
 
         # Export to Excel — MultiIndex columns become merged header rows automatically
         df.to_excel("05_Deploying\\error_calc_"+id+".xlsx", merge_cells=True)
@@ -1614,3 +1633,15 @@ def export_to_excel(data, id):
         return
 
 
+def get_max_reached_vals(arr:np.array, i:int):
+    """
+    gets maximum reached value (disp or strain) for one load path.
+
+    arr     (np.arr): Array at given key0 and key1; contains one loadpath for given rho_y and given scenario
+    i       (int)   : Direction of eps (either 0, 1, 2 for eps_x, eps_y or eps_xy resp. u_x, u_y)
+    
+    """
+
+    max_vals = np.max(arr[:,i], axis = 0)
+
+    return max_vals
