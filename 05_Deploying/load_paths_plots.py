@@ -76,10 +76,11 @@ def plot_load_paths(path_depl, case_study, until_load_level, save_path, type):
             'NLFEA': displ_NLFEA
         }
     elif type == 'eps':
-        eps_NN    = get_max_eps(relevant_dim, load_steps, path_depl, tag = 'NN')
+        # eps_NN    = get_max_eps(relevant_dim, load_steps, path_depl, tag = 'NN')
         eps_NLFEA = get_max_eps(relevant_dim, load_steps, path_depl, tag = 'norm')
         mat_displ = {
-            'NN': eps_NN,
+            # 'NN': eps_NN,
+            'NN': None,
             'NLFEA': eps_NLFEA
         }
 
@@ -119,7 +120,7 @@ def get_relevant_dim(case_study):
     # }
 
     mapping = {                     # for just plotting one strain / displacement per load-deformation path.
-        "2D-1": [2],                # indices for displacements, in the order [ux, uy, uz, thx, thy, thz] or [epsx, epsy, epsxy]
+        "2D-1": [5],                # indices for displacements, in the order [ux, uy, uz, thx, thy, thz] or [epsx, epsy, epsxy]
         "2D-2": [1], 
         "2D-3": [1],
         "2D-4": [0],
@@ -206,9 +207,9 @@ def plot_load_deform(load_steps, mat_displ, case_study, until_load_level, save_p
         ax = np.array([ax])
 
     for i in range(num_cols):
-        for j in range(mat_displ['NN'].shape[1]):
+        for j in range(mat_displ['NLFEA'].shape[1]):
             ax[i].plot(mat_displ['NLFEA'][step_l:step,j], np.abs(load_steps[step_l:step]), color = colors2[str(j)], marker = 'o', label = 'NLFEA, ' +labels[j])
-            ax[i].plot(mat_displ['NN'][step_l:step,j], np.abs(load_steps[step_l:step]), color = colors2[str(j)], linestyle = '--', marker = 'x', label = 'NN, '+labels[j])
+            # ax[i].plot(mat_displ['NN'][step_l:step,j], np.abs(load_steps[step_l:step]), color = colors2[str(j)], linestyle = '--', marker = 'x', label = 'NN, '+labels[j])
             if type == 'u':
                 ax[i].set_xlabel('Displacements [mm]')
             elif type == 'eps':

@@ -82,7 +82,8 @@ import os
 
 path_cwd = os.getcwd()
 # path = os.path.join(path_cwd, 'data_out')
-path = 'data_out\\data_20260119_0803_casexx\\1410'
+# path = 'data_out\\data_20260119_0803_casexx\\1410'
+path = 'data_out\\data_20260505_1556_casexx\\120'
 
 with open(os.path.join(path, 'mat_res_norm.pkl'),'rb') as handle:
 		mat_res_pkl = pickle.load(handle)

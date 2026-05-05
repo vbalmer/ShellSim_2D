@@ -2318,7 +2318,6 @@ def input_definition(mat, NN_hybrid):
         ])
 
     elif scenario == 1:         # twisting
-        raise UserWarning('Out of Date')
         " 2.1 Output:    - Global Boundary Conditions "
         "                  [xmin,xmax,ymin,ymax,zmin,zmax,BC_ux,BC_uy,BC_uz,BC_thx,BC_thy,BC_thz]"
         "                   BC_i in unit length (mm), 1234 if DOF is free"
@@ -2334,16 +2333,28 @@ def input_definition(mat, NN_hybrid):
         "               - Load_n: Global Nodal Loads"
         "                 [xmin,xmax,ymin,ymax,zmin,zmax,direction(x=1,y=2,z=3,thx=4,thy=5,thz=6),magnitude[N]]"
 
-        Load_el = np.array([
-                        [0,0,B,B,0,0,3,0],
-                        ])
+        
+        if isinstance(Force_mag, np.ndarray): 
+            nls = len(Force_mag)
+            Load_el = [[]]*nls
+            Load_n = [[]]*nls
+        else: 
+            nls = 1
+            Force_mag = [Force_mag]
+            Load_el = [[]]*nls
+            Load_n = [[]]*nls
+        
+        for i in range(nls):
+            Load_el[i] = np.array([
+                            [0,0,B,B,0,0,3,0],
+                            ])
 
-        Load_n  = np.array([
-                        [0,0,B,B,0,0,3,-1.5*Force_mag],
-                        [L,L,B,B,0,0,3,Force_mag],
-                        [L,L,0,0,0,0,3,-1.5*Force_mag],
-                        [0,0,0,0,0,0,3,Force_mag],
-        ])
+            Load_n[i]  = np.array([
+                            [0,0,B,B,0,0,3,-Force_mag[i]],
+                            [L,L,B,B,0,0,3,Force_mag[i]],
+                            [L,L,0,0,0,0,3,-Force_mag[i]],
+                            [0,0,0,0,0,0,3,Force_mag[i]],
+            ])
 
 
     elif scenario == 2:         # asymmetrical bending
@@ -3439,20 +3450,20 @@ def input_definition(mat, NN_hybrid):
     tb1 = [tb1] * na
     ec0 = [ec0] * na
     Dmax = [16] * na
-    rhox = [[rho_x,rho_x,rho_x,rho_x,0,0,0,0,0,0,0,0,0,0,0,0,rho_x,rho_x,rho_x,rho_x]]*na
+    rhox = [[0,0,rho_x,0,0,0,0,0,0,0,0,0,0,0,0,0,0,rho_x,0,0]]*na
     dx = [[D]*nl[0]]
     sx = [[200]*nl[0]]
     Esx = [Es]*na
     Eshx = [Esh] * na
-    fsyx = [fsy]
-    fsux = [fsu]
-    rhoy =[[rho_y,rho_y,rho_y,rho_y,0,0,0,0,0,0,0,0,0,0,0,0,rho_y,rho_y,rho_y,rho_y]]*na
+    fsyx = [534]
+    fsux = [628]
+    rhoy =[[0,0,0,rho_y,0,0,0,0,0,0,0,0,0,0,0,0,rho_y,0,0,0]]*na
     dy  = [[D]*nl[0]] * na
     sy = [[200]*nl[0]]
     Esy = [Es]*na
     Eshy = [Esh] * na
-    fsyy = [fsy] * na
-    fsuy = [fsu] * na
+    fsyy = [543] * na
+    fsuy = [638] * na
 
 
     # @bav: folgende parameter von phi bis fpuy unwichtig für dich (alle rhop müssen = 0 sein, a ansonsten CFK vorspannung)

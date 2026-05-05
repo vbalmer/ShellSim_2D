@@ -15,8 +15,8 @@ from plots_paper_utils import save_errors_to_excel
 # Definition of input parameters
 ##################################################
 
-PREDICT_SIG = True
-PREDICT_D = True
+PREDICT_SIG = False
+PREDICT_D = False
 PERM = False
 PERM1 = False
 
@@ -26,7 +26,7 @@ SIG_PLOTS = False
 U_PLOTS = False
 STRESS_PATHS = False
 LOAD_PATH = False
-MAX_VALS_APP = True
+MAX_VALS_APP = False
 
 PCA_PLOTS = False
 DIAG_PLOTS = False
@@ -45,8 +45,8 @@ COPY = True
 # GEOM = np.array([250, 0.015, 2])
 
 path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_480')
-path_depl = '05_Deploying\\data_out\\data_20260305_1114_casexx\\1000'
-save_path = '05_Deploying\\plots\\test'
+path_depl = '05_Deploying\\data_out\\data_20260505_1602_casexx\\140'
+save_path = '05_Deploying\\plots\\yannick'
 
 
 ##################################################
@@ -542,8 +542,8 @@ if LOAD_PATH:
         # plot_load_path_wrapper(path_depl, case_study = '2D-1C', until_load_level = [1,18], 
         #                        save_path = save_path, type = 'eps', thresh = 5)
         
-        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260305_1114_casexx', case_study = '2D-1C', until_load_level = [0,6], 
-                               save_path = save_path, type = 'eps', thresh = 10)
+        plot_load_path_wrapper('05_Deploying\\data_out\\data_20260505_1602_casexx', case_study = '2D-1', until_load_level = [0,10], 
+                               save_path = save_path, type = 'eps', thresh = 20)
 
         
         # plot_load_path_wrapper('05_Deploying\\data_out\\data_20260116_1510_casexx', case_study = '2D-3', until_load_level = [0,9], 

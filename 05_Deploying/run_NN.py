@@ -239,31 +239,33 @@ def run_deployment_loadpath(inp_run, force, new_folder_path = None):
 
     print(mat_tot)
 
+    if inp_run['predict'][0] or inp_run['predict'][1]:
+        ###########################################
+        # Deployment with NN
+        ###########################################
 
-    ###########################################
-    # Deployment with NN
-    ###########################################
+        conv_plt = {'conv': True,
+                    'else': False}
+        simple = True                                           # Leave this on "True" for deployment.
+        # samples = int(mat_tot.shape[0])
+        n_simple = 1                                            # can also be len(desired_SN) if imported data from simulations (not single_sample)
+        NN_hybrid = {
+            'predict_D': inp_run['predict'][1],                 # If true, solves the system with NN_hybrid solver (prediction of D); if False: "normal" solver
+            'predict_sig': inp_run['predict'][0],               # If true, solves the system with NN_hybrid solver (prediction of sig); if False: "normal" solver
+            'PERM': None,                                       # if true: permutates the values of the real stiffness matrix to simulate NN predictions
+            'model_dim': 'TWODIM',                              # can be ONEDIM_y, ONEDIM_x, TWODIM or ALLDIM, only needs to be specified if NN is used.
+            'numit': inp_run['numit'],
+            }
+        ####
+        # Note: predict_D should not be used in lin.el. case, as there is only one initialisation and this happens with lin.el. model. 
+        # => for lin.el. always set predict_D = False (glass / steel / RC)
+        # => for nonlin: can choose what should be predicted.
+        ####
 
-    conv_plt = {'conv': True,
-                'else': False}
-    simple = True                                           # Leave this on "True" for deployment.
-    # samples = int(mat_tot.shape[0])
-    n_simple = 1                                            # can also be len(desired_SN) if imported data from simulations (not single_sample)
-    NN_hybrid = {
-        'predict_D': inp_run['predict'][1],                 # If true, solves the system with NN_hybrid solver (prediction of D); if False: "normal" solver
-        'predict_sig': inp_run['predict'][0],               # If true, solves the system with NN_hybrid solver (prediction of sig); if False: "normal" solver
-        'PERM': None,                                       # if true: permutates the values of the real stiffness matrix to simulate NN predictions
-        'model_dim': 'TWODIM',                              # can be ONEDIM_y, ONEDIM_x, TWODIM or ALLDIM, only needs to be specified if NN is used.
-        'numit': inp_run['numit'],
-        }
-    ####
-    # Note: predict_D should not be used in lin.el. case, as there is only one initialisation and this happens with lin.el. model. 
-    # => for lin.el. always set predict_D = False (glass / steel / RC)
-    # => for nonlin: can choose what should be predicted.
-    ####
-
-    mat_res = run_deployment(mat_tot, conv_plt, simple, n_simple, NN_hybrid, path_collection, new_folder_path)
-    mat_res_pd_NN = pd.DataFrame.from_dict(mat_res)
+        mat_res = run_deployment(mat_tot, conv_plt, simple, n_simple, NN_hybrid, path_collection, new_folder_path)
+        mat_res_pd_NN = pd.DataFrame.from_dict(mat_res)
+    else:
+        print("This run didn't request any calculation with NN. If you wish to do so, set predict = True.")
 
 
     ###########################################

@@ -14,21 +14,21 @@ from run_NN import run_deployment_loadpath, save_deployment_loadpath
 #################
 
 mat_tot_dict = {                        # no force definition here, as this changes with every iteration
-    'L': np.array([6000]),
-    'B': np.array([6000]),
-    'CC': np.array([1]),
+    'L': np.array([2000]),
+    'B': np.array([2000]),
+    'CC': np.array([6]),
     'E_1': np.array([0]),
     'E_2': np.array([0]),
-    'ms': np.array([600]),
-    's': np.array([110]),
+    'ms': np.array([200]),
+    's': np.array([1]),
     't_1': np.array([300]),
     't_2': np.array([0]),
     'nl': np.array([20]),
     'nu_1': np.array([0]),
     'nu_2': np.array([0]),
     'mat': np.array([3]),
-    'rho_x': np.array([0.025]),
-    'rho_y': np.array([0.025])
+    'rho_x': np.array([0.135]),
+    'rho_y': np.array([0.044])
 }
 
 
@@ -37,8 +37,8 @@ inp_run = {
     "model_no": ["480", "167"],                                 # [model version, epoch number]
     # "model_no": ["491", "291"],
     # "model_no": ["492", "298"],
-    "numit": 9,
-    "predict": [True, True]                                     # [predict_sig, predict_D]
+    "numit": 10,
+    "predict": [False, False]                                     # [predict_sig, predict_D]
 }
 
 CONTINUE = True                                                 # if CONTINUE = True: continues iteration from previous load level, 
@@ -47,7 +47,7 @@ CONTINUE = True                                                 # if CONTINUE = 
 
 
 # rho_y = 1%
-load_levels = [200, 400, 600, 800, 1000, 1100, 1200, 1300, 1350, 1375, 1400, 1410, 1420]
+# load_levels = [200, 400, 600, 800, 1000, 1100, 1200, 1300, 1350, 1375, 1400, 1410, 1420]
 # load_levels = [-2000, -4000, -6000, -8000, -9000, -10000, -10100, -10200, -10250, -10300]
 # load_levels = [-200, -500, -1000, -2000, -2050, -2100, -2150, -2200]
 # load_levels = [-200, -1000, -2000, -3000, -3500, -4000, -4250, -4500]
@@ -80,6 +80,14 @@ load_levels = [200, 400, 600, 800, 1000, 1100, 1200, 1300, 1350, 1375, 1400, 141
 # load_levels = [-200, -500, -1000, -2000, -2050, -2100, -2150, -2200]
 # load_levels = [100, 200, 300, 400, 425, 450, 475]
 # load_levels = [-200, -1000, -2000, -3000, -3500, -4000, -4250, -4500]
+
+
+# test yannick
+# load_levels = [20_000, 40_000, 60_000, 80_000, 100_000, 120_000, 150_000]
+# load_levels = [10_000, 20_000, 30_000, 40_000, 50_000, 60_000, 75_000]
+# load_levels = [5, 10, 15, 20, 25, 30, 37.5]
+load_levels = [20, 40, 60, 80, 100, 120, 125, 130, 135, 140]
+
 
 
 #################
