@@ -27,9 +27,10 @@ class HiddenPrints:
         sys.stdout = self._original_stdout
 
 
-def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_dim = 'ALLDIM', save_path = None, 
-                      multirow = False, maxmin_lims = False, ax_quantiles_sig = [0,1], ax_quantiles_D = [0,1], 
-                      NN_comp = None, exp_dict = None, rho_sublayer = False, allcols = False, train_points = False):
+def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_dim = 'ALLDIM', save_path = None,
+                      multirow = False, maxmin_lims = False, ax_quantiles_sig = [0,1], ax_quantiles_D = [0,1],
+                      NN_comp = None, exp_dict = None, rho_sublayer = False, allcols = False, train_points = False,
+                      diagonal = False, diag_ratios = None, xlim = None, ylim = None):
     '''
     idx_eps         (list)      desired dimension for input epsilon - if len(idx_eps) >1: the first eps_idx will be varied, the second will be in three steps.
     geom            (list)      geometrical input parameters (t, rho, CC)
@@ -49,8 +50,19 @@ def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_di
     rho_sublayer    (bool)      if True: rho only in 8 sublayers, not in every layer
     model_dim       (str)       can be "ONEDIM_x", "ONEDIM_y", "TWODIM" or "ALLDIM", depending on the NN architecture 
     allcols         (bool)      if True, prints all predictions of all stiffness matrix entries, not just the ones related to the varied epsilon
-    train_points    (bool)      if True, will plot training points of the corresponding geometry and stress / stiffness 
+    train_points    (bool)      if True, will plot training points of the corresponding geometry and stress / stiffness
                                 in addition to the predicted and NLFEA curves
+    diagonal        (bool)      if True: biaxial-tension test. Instead of ramping a single strain component,
+                                every dimension in idx_eps is ramped by the same swept values (scaled by
+                                diag_ratios), producing one biaxial curve. Requires len(idx_eps) >= 2.
+    diag_ratios     (list)      per-swept-dim scaling of the diagonal ramp (same length/order as idx_eps);
+                                None -> [0.95, 1.0], i.e. eps_x = 0.95 * eps_y (slightly off-diagonal biaxial
+                                tension, as sampled in ShellSim3D). [1.0, 1.0] -> exact equibiaxial line.
+    xlim            (list)      if not None: (xmin, xmax) strain limits applied to the swept x-axis of the
+                                sigma / D subplots (zoom-in, does not change the sampling range). None (default)
+                                -> full range, no x-axis constraint.
+    ylim            (list)      if not None: (ymin, ymax) limits applied to the y-axis of ALL stress (sigma)
+                                subplots. Overrides maxmin_lims for those axes. None (default) -> no constraint.
 
 
     main function, calls all functions below step-wise
@@ -62,10 +74,19 @@ def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_di
     '''
 
 
+    # Step 0: (Optional) biaxial-tension set-up
+    if diagonal:
+        if len(idx_eps) < 2:
+            raise UserWarning('diagonal = True (biaxial tension) needs at least two swept dimensions, '
+                              f'e.g. idx_eps = [0, 1], got idx_eps = {idx_eps}.')
+        if diag_ratios is None:
+            diag_ratios = [0.95, 1.0]                        # eps_x = 0.95 * eps_y (as sampled in ShellSim3D)
+        print(f'Biaxial-tension mode: ramping eps dims {idx_eps} with ratios {diag_ratios}.')
+
     # Step 1: Sample a meaningful vector for idx_eps
     range_factor = 1
-    inp_vector = sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor)
-    inp_vector_star = sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor, small_value = 1e-9)
+    inp_vector = sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor, diagonal = diagonal, diag_ratios = diag_ratios)
+    inp_vector_star = sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor, small_value = 1e-9, diagonal = diagonal, diag_ratios = diag_ratios)
     print(f'Sampled eps values in [min, {range_factor}*max] of entire sampled epsilon range.')
 
     # Step 2a: Calculate all NLFEA values for given eps input
@@ -85,28 +106,33 @@ def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_di
     print('Calculated NN values')
 
     # Step 2d: (Optional) Fetch training points to plot based on given geometry
+    if train_points and diagonal:
+        print('Warning: train_points overlay is not supported in biaxial/diagonal mode (curves only). '
+              'Skipping training-point overlay.')
+        train_points = False
     if train_points:
         sig_D_train = get_sig_D_train(inp_vector, geom, model_path, NN_comp, idx_eps)
         print('Fetched training data points')
-    else: 
+    else:
         sig_D_train = None
 
     # Step 3: Plot the figures
     if not multirow:
-        fig1 = plot_singlerow(idx_eps, idx_sig, idx_D, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, 
-                              model_path, maxmin_lims, ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, train_points)
-    else: 
+        fig1 = plot_singlerow(idx_eps, idx_sig, idx_D, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train,
+                              model_path, maxmin_lims, ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, train_points, diagonal, diag_ratios, xlim, ylim)
+    else:
         # does not require idx_sig or idx_D anymore
-        fig2 = plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, 
-                             model_path, maxmin_lims, ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, allcols, train_points)
-        
+        fig2 = plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train,
+                             model_path, maxmin_lims, ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, allcols, train_points, diagonal, diag_ratios, xlim, ylim)
+
     # Step 4: Save the figures
-    if save_path is not None and not multirow: 
-        filename = 'stress_path_'+str(idx_eps)+'_'+str(idx_D)
+    tag_bx = '_biaxial' if diagonal else ''
+    if save_path is not None and not multirow:
+        filename = 'stress_path_'+str(idx_eps)+'_'+str(idx_D)+tag_bx
         fig1.savefig(os.path.join(save_path, filename))
         print('Saved stress path figure ', filename, ' at ', save_path)
-    elif multirow: 
-        filename = 'stress_path_'+str(idx_eps)+'_multirow.png'
+    elif multirow:
+        filename = 'stress_path_'+str(idx_eps)+tag_bx+'_multirow.png'
         fig2.savefig(os.path.join(save_path, filename))
         print('Saved stress path multirow figure at ', save_path)
 
@@ -115,9 +141,9 @@ def plot_stress_paths(idx_eps, geom, idx_sig, idx_D, model_path, epnum, model_di
 
 ################ sub-functions #####################
 
-def plot_singlerow(idx_eps, idx_sig, idx_D, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, model_path, maxmin_lims, 
-                   ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, train_points):
-    
+def plot_singlerow(idx_eps, idx_sig, idx_D, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, model_path, maxmin_lims,
+                   ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, train_points, diagonal = False, diag_ratios = None, xlim = None, ylim = None):
+
     model_name_1 = model_path[-5:]
     if NN_comp is not None: 
         model_name_2 = NN_comp[0][-5:]
@@ -176,11 +202,23 @@ def plot_singlerow(idx_eps, idx_sig, idx_D, inp_vector, inp_vector_star, sig_D_N
                 axs[1].set_ylim(lims_sig['y_lim_0'])
                 axs[2].set_ylim(lims_D['y_lim_1'])
 
+            if xlim is not None:
+                axs[1].set_xlim(xlim)
+                axs[2].set_xlim(xlim)
+
+            if ylim is not None:
+                axs[1].set_ylim(ylim)                    # stress subplot
+
+            if diagonal:
+                fig1.suptitle('Biaxial tension: ' + ', '.join(
+                    [f'$\epsilon_{{{k}}} = {(diag_ratios[i] if diag_ratios is not None else 1.0)}\cdot s$'
+                     for i, k in enumerate(idx_eps)]) + f' (x-axis: $\epsilon_{{{idx_eps[0]}}}$)')
+
 
     return fig1
 
-def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, model_path, maxmin_lims, 
-                  ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, allcols, train_points):
+def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA_star, sig_D_NN, sig_D_linel, sig_D_train, model_path, maxmin_lims,
+                  ax_quantiles_sig, ax_quantiles_D, NN_comp, exp_dict, model_dim, allcols, train_points, diagonal = False, diag_ratios = None, xlim = None, ylim = None):
     if allcols: 
         num_cols = 5
     else: 
@@ -206,7 +244,7 @@ def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA
             for i in range(num_rows):
                 # Plot histograms
                 if key == '0':
-                    if len(idx_eps) > 1 and i == idx_eps[1]:
+                    if len(idx_eps) > 1 and not diagonal and i == idx_eps[1]:
                         ns = inp_vector[key].shape[0]
                         inp_vec_hist = np.concatenate((inp_vector['0'][:int(ns/3),idx_eps[1]], inp_vector['min'][:int(ns/3),idx_eps[1]], inp_vector['max'][:int(ns/3),idx_eps[1]]), axis = 0)
                         axs[i,0].hist(inp_vec_hist, color = 'grey', alpha = 0.5, label = 'NLFEA = NN = linel')
@@ -214,13 +252,18 @@ def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA
                     else:
                         axs[i,0].hist(inp_vector[key][:,i], color = 'grey', alpha = 0.5, label = 'NLFEA = NN = linel')
                         axs[i,0].set_xlabel('$\epsilon_{'+str(i)+'} [-] $')
-                        
+
                 # Plot predictions vs NLFEA vs LFEA for sigma
-                if len(idx_eps) > 1:
+                if diagonal:
+                    # biaxial tension: single curve; note the ramped dims in the label
+                    ratio_str = ', '.join([f'$\epsilon_{{{k}}}={(diag_ratios[i2] if diag_ratios is not None else 1.0)}s$'
+                                           for i2, k in enumerate(idx_eps)])
+                    labels = ['NLFEA (biaxial: '+ratio_str+')', 'NN (biaxial: '+ratio_str+')', 'NLFEA*']
+                elif len(idx_eps) > 1:
                     labels = ['NLFEA, $\epsilon_'+ str(idx_eps[1]) + ' = $'+str(np.round(inp_vector[key][0, idx_eps[1]], 3))+' [-]',
-                              'NN, $\epsilon_'+ str(idx_eps[1]) + ' = $'+str(np.round(inp_vector[key][0, idx_eps[1]], 3))+' [-]', 
+                              'NN, $\epsilon_'+ str(idx_eps[1]) + ' = $'+str(np.round(inp_vector[key][0, idx_eps[1]], 3))+' [-]',
                               'NLFEA*']
-                else: 
+                else:
                     labels = ['NLFEA', 'NN', 'NLFEA*']
                 axs[i,1].plot(inp_vector[key][:,idx_eps[0]], sig_D_NLFEA[key]['sh_NLFEA'][:,i,0], color = colors1[key], label = labels[0])
                 axs[i,1].plot(inp_vector_star[key][:,idx_eps[0]], sig_D_NLFEA_star[key]['sh_NLFEA'][:,i,0], color = colors1[key], linestyle = '--', label = labels[2])
@@ -260,25 +303,69 @@ def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA
                     
 
                 # Plot predictions vs NLFEA vs LFEA for all D (if allcols = True)
-                if allcols:
+                if allcols and not diagonal:
                     for j in [2,3,4]:
                         axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NLFEA[key]['D_NLFEA'][:,i, j-2], color = colors1[key], label = labels[0])
                         axs[i,j].plot(inp_vector_star[key][:,idx_eps[0]], sig_D_NLFEA_star[key]['D_NLFEA'][:,i, j-2], color = colors1[key], linestyle = '--', label = labels[2])
                         axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NN[key]['D_NN'][:,i, j-2], color = colors2[key], linestyle = '--', label = labels[1]+ ' ' + model_name_1)
-                        if NN_comp is not None: 
+                        if NN_comp is not None:
                             axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NN[key]['D_NN_1'][:,i, j-2], color = colors3[key], linestyle = '--', label = labels[1]+ ' ' + model_name_2)
                         if key == '0':
-                            axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_linel[key]['D_linel'][:,i,j-2], color = 'lightgrey', linestyle = ':', 
+                            axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_linel[key]['D_linel'][:,i,j-2], color = 'lightgrey', linestyle = ':',
                                         label = 'Lin.El.')
                             axs[i,j].set_xlabel('$\epsilon_{'+str(idx_eps[0])+'} [-]$')
                             axs[i,j].set_ylabel('$D_{'+str(i)+','+str(j-2)+'} [N,mm]$')
                         if train_points:
-                            axs[i,j].scatter(sig_D_train[key]['eh_train'][:, idx_eps[0]], sig_D_train[key]['D_train'][:, i, j-2], color = colors2[key], alpha = 0.3, 
+                            axs[i,j].scatter(sig_D_train[key]['eh_train'][:, idx_eps[0]], sig_D_train[key]['D_train'][:, i, j-2], color = colors2[key], alpha = 0.3,
                                     marker = 'x', label = "Training data " + model_name_1)
-                            if NN_comp is not None: 
-                                axs[i,j].scatter(sig_D_train[key]['eh_train1'][:, idx_eps[0]], sig_D_train[key]['D_train1'][:, i, j-2], color = colors3[key], alpha = 0.3, 
+                            if NN_comp is not None:
+                                axs[i,j].scatter(sig_D_train[key]['eh_train1'][:, idx_eps[0]], sig_D_train[key]['D_train1'][:, i, j-2], color = colors3[key], alpha = 0.3,
                                         marker = 'x', label = "Training data " + model_name_2)
-                    
+
+                # Biaxial (diagonal) case: repurpose cols 2, 3, 4 to show the eps_1 dependence
+                #   col 2 -> D[i, idx_eps[0]] vs eps_0 (unchanged)
+                #   col 3 -> sig_i          vs eps_1
+                #   col 4 -> D[i, idx_eps[1]] vs eps_1
+                elif allcols and diagonal:
+                    x1      = inp_vector[key][:, idx_eps[1]]
+                    x1_star = inp_vector_star[key][:, idx_eps[1]]
+
+                    # col 2: D[i, idx_eps[0]] vs eps_0 (keep the eps_0 stiffness column)
+                    j = 2
+                    axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NLFEA[key]['D_NLFEA'][:,i, idx_eps[0]], color = colors1[key], label = labels[0])
+                    axs[i,j].plot(inp_vector_star[key][:,idx_eps[0]], sig_D_NLFEA_star[key]['D_NLFEA'][:,i, idx_eps[0]], color = colors1[key], linestyle = '--', label = labels[2])
+                    axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NN[key]['D_NN'][:,i, idx_eps[0]], color = colors2[key], linestyle = '--', label = labels[1]+ ' ' + model_name_1)
+                    if NN_comp is not None:
+                        axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_NN[key]['D_NN_1'][:,i, idx_eps[0]], color = colors3[key], linestyle = '--', label = labels[1]+ ' ' + model_name_2)
+                    if key == '0':
+                        axs[i,j].plot(inp_vector[key][:,idx_eps[0]], sig_D_linel[key]['D_linel'][:,i, idx_eps[0]], color = 'lightgrey', linestyle = ':', label = 'Lin.El.')
+                        axs[i,j].set_xlabel('$\epsilon_{'+str(idx_eps[0])+'} [-]$')
+                        axs[i,j].set_ylabel('$D_{'+str(i)+','+str(idx_eps[0])+'} [N,mm]$')
+
+                    # col 3: sig_i vs eps_1
+                    j = 3
+                    axs[i,j].plot(x1, sig_D_NLFEA[key]['sh_NLFEA'][:,i,0], color = colors1[key], label = labels[0])
+                    axs[i,j].plot(x1_star, sig_D_NLFEA_star[key]['sh_NLFEA'][:,i,0], color = colors1[key], linestyle = '--', label = labels[2])
+                    axs[i,j].plot(x1, sig_D_NN[key]['sh_NN'][:,i], color = colors2[key], linestyle = '--', label = labels[1]+ ' ' + model_name_1)
+                    if NN_comp is not None:
+                        axs[i,j].plot(x1, sig_D_NN[key]['sh_NN_1'][:,i], color = colors3[key], linestyle = '--', label = labels[1]+ ' ' + model_name_2)
+                    if key == '0':
+                        axs[i,j].plot(x1, sig_D_linel[key]['sh_linel'][:,i], color = 'lightgrey', linestyle = ':', label = 'Lin.El.')
+                        axs[i,j].set_xlabel('$\epsilon_{'+str(idx_eps[1])+'} [-] $')
+                        axs[i,j].set_ylabel('$\sigma_{'+str(i)+'} [N,mm] $')
+
+                    # col 4: D[i, idx_eps[1]] vs eps_1
+                    j = 4
+                    axs[i,j].plot(x1, sig_D_NLFEA[key]['D_NLFEA'][:,i, idx_eps[1]], color = colors1[key], label = labels[0])
+                    axs[i,j].plot(x1_star, sig_D_NLFEA_star[key]['D_NLFEA'][:,i, idx_eps[1]], color = colors1[key], linestyle = '--', label = labels[2])
+                    axs[i,j].plot(x1, sig_D_NN[key]['D_NN'][:,i, idx_eps[1]], color = colors2[key], linestyle = '--', label = labels[1]+ ' ' + model_name_1)
+                    if NN_comp is not None:
+                        axs[i,j].plot(x1, sig_D_NN[key]['D_NN_1'][:,i, idx_eps[1]], color = colors3[key], linestyle = '--', label = labels[1]+ ' ' + model_name_2)
+                    if key == '0':
+                        axs[i,j].plot(x1, sig_D_linel[key]['D_linel'][:,i, idx_eps[1]], color = 'lightgrey', linestyle = ':', label = 'Lin.El.')
+                        axs[i,j].set_xlabel('$\epsilon_{'+str(idx_eps[1])+'} [-]$')
+                        axs[i,j].set_ylabel('$D_{'+str(i)+','+str(idx_eps[1])+'} [N,mm]$')
+
 
         else:
             pass
@@ -295,54 +382,79 @@ def plot_multirow(idx_eps, inp_vector, inp_vector_star, sig_D_NLFEA, sig_D_NLFEA
                 lims_D = get_min_max_lims(j-2,i, model_path, model_dim, ax_quantiles_D, tag = 'D')
                 axs[i,j].set_ylim(lims_D['y_lim_1'])
 
+    if xlim is not None:
+        # zoom the swept x-axis (sigma / D columns); column 0 is the eps-histogram and is left as-is
+        for i in range(num_rows):
+            for j in range(1, num_cols):
+                axs[i,j].set_xlim(xlim)
+
+    if ylim is not None:
+        # apply to all stress (sigma) subplots: col 1 always, plus col 3 in the biaxial allcols layout
+        sig_cols = [1] + ([3] if (allcols and diagonal) else [])
+        for i in range(num_rows):
+            for j in sig_cols:
+                axs[i,j].set_ylim(ylim)
+
     axs[0,0].legend()
     axs[0,num_cols-1].legend()
 
     return fig2
 
 
-def sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor = 1, num_samples = 100, small_value = 1e-20):
+def sample_idx_eps(idx_eps, geom, model_path, model_dim, range_factor = 1, num_samples = 100, small_value = 1e-20,
+                   diagonal = False, diag_ratios = None):
     '''
-    samples eps_inp only for the dimension given in idx_eps  
-    
+    samples eps_inp only for the dimension given in idx_eps
+
     idx_eps      (list)       desired dimension for input epsilon
     geom         (list)       geometrical input parameters (t, rho, CC)
     model_path   (str)        path to sampled data
     model_dim    (str)        architecture type of the model.
     range_factor (float)      to reduce the max. range of epsilons in the input vector
     num_samples  (int)        amount of values to be sampled in eps
+    diagonal     (bool)       if True: biaxial tension - ramp every dim in idx_eps by the same swept
+                              values (scaled by diag_ratios), producing a single curve (key '0').
+    diag_ratios  (list)       per-swept-dim scaling of the diagonal ramp (same length/order as idx_eps);
+                              None -> all 1.0. e.g. [0.95, 1.0] -> eps_x = 0.95 * eps_y.
 
     '''
-    
+
     with open(os.path.join(model_path, 'mat_data_np_TrainEvalTest.pkl'),'rb') as handle:
                 mat_data_np = pickle.load(handle)
 
-    if len(idx_eps) < 2: 
+    if len(idx_eps) < 2 or diagonal:
         eps_vec = small_value*np.ones((num_samples, 8))                  # other values are set to "zero", i.e. small_value here
         if model_dim == 'ONEDIM_y':
             max_idx_eps = np.max(mat_data_np['X_train'][:,0])
             min_idx_eps = np.min(mat_data_np['X_train'][:,0])
-        elif model_dim == 'TWODIM': 
+        elif model_dim == 'TWODIM':
             max_idx_eps = np.max(mat_data_np['X_train'][:,idx_eps[0]])
             min_idx_eps = np.min(mat_data_np['X_train'][:,idx_eps[0]])
-        else: 
+        else:
             # works for ONEDIM_x or ALLDIM
             max_idx_eps = np.max(mat_data_np['X_train'][:,idx_eps[0]])
             min_idx_eps = np.min(mat_data_np['X_train'][:,idx_eps[0]])
         idx_eps_vec = np.linspace(min_idx_eps, range_factor*max_idx_eps, num_samples)
-        if idx_eps[0] > 2 and idx_eps[0] < 6:
-            idx_eps_vec = idx_eps_vec/10                           # convert to 1/mm
-        eps_vec[:,idx_eps[0]] = idx_eps_vec
-        
+        if diagonal:
+            # biaxial (off-)diagonal ramp: assign the swept values (scaled by diag_ratios) to every dim in idx_eps
+            for i, k in enumerate(idx_eps):
+                ratio = diag_ratios[i] if diag_ratios is not None else 1.0
+                vec_k = idx_eps_vec/10 if (k > 2 and k < 6) else idx_eps_vec    # convert to 1/mm for curvatures
+                eps_vec[:,k] = ratio * vec_k
+        else:
+            if idx_eps[0] > 2 and idx_eps[0] < 6:
+                idx_eps_vec = idx_eps_vec/10                           # convert to 1/mm
+            eps_vec[:,idx_eps[0]] = idx_eps_vec
+
         t_vec = np.tile(np.array(geom), (num_samples, 1))
 
         inp_vec = {
-            'min': None, 
+            'min': None,
             '0': np.concatenate((eps_vec, t_vec), axis = 1),                    # this now has the desired shape
             'max': None,
         }
 
-    else: 
+    else:
         if model_dim == 'ONEDIM_x' or model_dim == 'ONEDIM_y': 
             raise UserWarning('Onedim model, it does not make sense to plot multiple epsilon. Please change idx_eps to len(idx_eps) = 1')
         elif model_dim == 'TWODIM':

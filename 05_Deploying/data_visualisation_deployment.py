@@ -24,9 +24,9 @@ INP_PLOTS = False
 D_PLOTS = False
 SIG_PLOTS = False
 U_PLOTS = False
-STRESS_PATHS = False
+STRESS_PATHS = True
 LOAD_PATH = False
-MAX_VALS_APP = True
+MAX_VALS_APP = False
 
 PCA_PLOTS = False
 DIAG_PLOTS = False
@@ -498,12 +498,13 @@ if STRESS_PATHS:
                 
 
         path = os.path.join(os.getcwd(), '04_Training\\new_data\\_simple_logs\\v_479')
-        plot_stress_paths(idx_eps= [1], geom = [300, 0.025, 0.025, 1], idx_sig = [0], idx_D = [0,0], 
+        plot_stress_paths(idx_eps= [0,1], geom = [300, 0.025, 0.025, 1], idx_sig = [0], idx_D = [0,0], 
                           model_path = path, epnum= '_294', model_dim = 'TWODIM', save_path = save_path, 
                           multirow=True, maxmin_lims = False, ax_quantiles_sig = [0, 0.98], ax_quantiles_D = [0,0.99],
                         #   NN_comp = None,
                           NN_comp = ['04_Training\\new_data\\_simple_logs\\v_453', '_187', 'TWODIM'],
-                          exp_dict = None, rho_sublayer=True, allcols = True, train_points = False)
+                          exp_dict = None, rho_sublayer=True, allcols = True, train_points = False, 
+                          diagonal = True, diag_ratios = [0.95,1], xlim = [-3e-3,5e-3], ylim = [-10_000, 3_000])
         
 
 ################ load-paths ##################
